@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.application</groupId>
-    <artifactId>EnterpriseBackendDesign</artifactId>
+    <artifactId>enterprise-backend-design</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>EnterpriseBackendDesign</name>
-    <description>EnterpriseBackendDesign</description>
+    <name>enterprise-backend-design</name>
+    <description>Enterprise Order and Billing Service</description>
     <url/>
     <licenses>
         <license/>
