@@ -1,4 +1,8 @@
 package com.application.enterprisebackenddesign.domain.order;
 
-public class OrderStatus {
+public enum OrderStatus {
+    CREATED,
+    CONFIRMED,
+    CANCELLED,
+    BILLED
 }
