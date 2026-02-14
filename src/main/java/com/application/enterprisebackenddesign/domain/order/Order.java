@@ -39,4 +39,22 @@ public class Order {
             throw new DomainException.BusinessRuleViolationException("Cannot add line to order with status: " + status);
         }
     }
+
+    public void removeLine(OrderLine orderLine) throws DomainException.BusinessRuleViolationException {
+
+        if(orderLine == null){
+            throw new DomainException.BusinessRuleViolationException("Order line cannot be null.");
+        }
+
+        if(!orderLines.contains(orderLine)){
+            throw new DomainException.BusinessRuleViolationException("Order line does not exist.");
+        }
+
+        if(status == OrderStatus.CREATED) {
+            orderLines.remove(orderLine);
+            totalAmount = calculateTotal();
+        } else {
+            throw new DomainException.BusinessRuleViolationException("Cannot remove line from order with status: " + status);
+        }
+    }
 }
