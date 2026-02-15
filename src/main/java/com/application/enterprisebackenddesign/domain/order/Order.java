@@ -14,8 +14,10 @@ public class Order {
     private final List<OrderLine> orderLines;
     private Money totalAmount;
     private final List<DomainEvent> events = new ArrayList<>();
+    private final Long orderLineId;
 
-    public Order(Long id, Long customerId, List<OrderLine> orderLines) throws DomainException.BusinessRuleViolationException {
+    public Order(Long id, Long customerId, List<OrderLine> orderLines, Long orderLineId) throws DomainException.BusinessRuleViolationException {
+
         if(id == null){
             throw new DomainException.BusinessRuleViolationException("Id cannot be null.");
         }
@@ -24,8 +26,12 @@ public class Order {
             throw new DomainException.BusinessRuleViolationException("Customer id cannot be null.");
         }
         this.customerId = customerId;
+        if(orderLines == null){
+            throw new DomainException.BusinessRuleViolationException("Order line id cannot be null.");
+        }
+        this.orderLineId = orderLineId;
         this.status = OrderStatus.CREATED;
-        this.orderLines = orderLines != null ? new ArrayList<>(orderLines) : new ArrayList<>();
+        this.orderLines = new ArrayList<>(orderLines);
         this.totalAmount = calculateTotal();
 
         events.add(new OrderCreatedEvent(id, customerId, this.orderLines.size()));
@@ -44,6 +50,7 @@ public class Order {
         if(status == OrderStatus.CREATED) {
             orderLines.add(orderLine);
             totalAmount = calculateTotal();
+            events.add(new OrderLineUpdatedEvent(DomainEventType.ORDER_UPDATED, this.id, this.customerId, this.orderLineId, 0, orderLine.getQuantity()));
         } else {
             throw new DomainException.BusinessRuleViolationException("Cannot add line to order with status: " + status);
         }
@@ -62,6 +69,7 @@ public class Order {
         if(status == OrderStatus.CREATED) {
             orderLines.remove(orderLine);
             totalAmount = calculateTotal();
+            events.add(new OrderLineUpdatedEvent(DomainEventType.ORDER_UPDATED, this.id, this.customerId, this.orderLineId, orderLine.getQuantity(), 0));
         } else {
             throw new DomainException.BusinessRuleViolationException("Cannot remove line from order with status: " + status);
         }
@@ -128,6 +136,7 @@ public class Order {
                 orderLines.set(index, updatedOrderLine);
             }
             totalAmount = calculateTotal();
+            events.add(new OrderLineUpdatedEvent(DomainEventType.ORDER_UPDATED, this.id, this.customerId, this.orderLineId, orderLine.getQuantity(), newQuantity));
         } else {
             throw new DomainException("Cannot update orderLines. Current status: " + status);
         }
