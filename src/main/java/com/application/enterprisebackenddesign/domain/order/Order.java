@@ -80,4 +80,11 @@ public class Order {
             throw new DomainException("Cannot cancel order. Current status: " + status);
         }
     }
+
+    public List<DomainEvent> pullEvents() {
+
+        List<DomainEvent> copiedEvents = new ArrayList<>(events);
+        events.clear();
+        return copiedEvents;
+    }
 }
