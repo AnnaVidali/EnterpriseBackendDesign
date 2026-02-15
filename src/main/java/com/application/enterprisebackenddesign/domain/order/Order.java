@@ -15,8 +15,14 @@ public class Order {
     private Money totalAmount;
     private final List<DomainEvent> events = new ArrayList<>();
 
-    public Order(Long id, Long customerId, List<OrderLine> orderLines) {
+    public Order(Long id, Long customerId, List<OrderLine> orderLines) throws DomainException.BusinessRuleViolationException {
+        if(id == null){
+            throw new DomainException.BusinessRuleViolationException("Id cannot be null.");
+        }
         this.id = id;
+        if(customerId == null){
+            throw new DomainException.BusinessRuleViolationException("Customer id cannot be null.");
+        }
         this.customerId = customerId;
         this.status = OrderStatus.CREATED;
         this.orderLines = orderLines != null ? new ArrayList<>(orderLines) : new ArrayList<>();
