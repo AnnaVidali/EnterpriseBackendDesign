@@ -101,4 +101,29 @@ public class Order {
         }
         return total;
     }
+
+    public void updateOrderLines(OrderLine orderLine, int newQuantity) throws DomainException {
+
+        if(orderLine == null){
+            throw new DomainException("Order line cannot be null.");
+        }
+        if(status == OrderStatus.CREATED){
+            if(!orderLines.contains(orderLine)){
+                throw new DomainException("Order line does not exist.");
+            }
+            if(newQuantity < 0){
+                throw new DomainException("New quantity cannot be negative.");
+            }
+            int index = orderLines.indexOf(orderLine);
+            if(newQuantity == 0) {
+                orderLines.remove(index);
+            } else {
+                OrderLine updatedOrderLine = orderLine.withQuantity(newQuantity);
+                orderLines.set(index, updatedOrderLine);
+            }
+            totalAmount = calculateTotal();
+        } else {
+            throw new DomainException("Cannot update orderLines. Current status: " + status);
+        }
+    }
 }
