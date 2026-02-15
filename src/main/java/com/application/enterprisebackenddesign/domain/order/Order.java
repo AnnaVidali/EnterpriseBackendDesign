@@ -62,11 +62,22 @@ public class Order {
     }
 
     public void confirmOrder() throws DomainException {
+
         if(status == OrderStatus.CREATED && !orderLines.isEmpty()){
             status = OrderStatus.CONFIRMED;
             events.add(new OrderConfirmedEvent(id, customerId));
         } else {
-            throw new DomainException("Cannot confirm order. Order status is " + status);
+            throw new DomainException("Cannot confirm order. Current status: " + status + ", lines count: " + orderLines.size());
+        }
+    }
+
+    public void cancelOrder() throws DomainException {
+
+        if(status == OrderStatus.CONFIRMED){
+            status = OrderStatus.CANCELLED;
+            events.add(new OrderCancelledEvent(id, customerId));
+        } else {
+            throw new DomainException("Cannot cancel order. Current status: " + status);
         }
     }
 }
