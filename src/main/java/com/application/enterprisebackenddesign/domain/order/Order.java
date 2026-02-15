@@ -87,4 +87,18 @@ public class Order {
         events.clear();
         return copiedEvents;
     }
+
+    private Money calculateTotal() {
+
+        Money total = Money.zero();
+
+        if(orderLines.isEmpty()){
+            return Money.zero();
+        }
+        for(OrderLine orderLine : orderLines){
+            Money subtotal = orderLine.getPrice().multiply(orderLine.getQuantity());
+            total = total.add(subtotal);
+        }
+        return total;
+    }
 }
