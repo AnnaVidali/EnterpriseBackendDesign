@@ -141,4 +141,16 @@ public class Order {
             throw new DomainException("Cannot update orderLines. Current status: " + status);
         }
     }
+
+    public int getNumberOfOrderLines() {
+        return orderLines.size();
+    }
+
+    public boolean hasLine(OrderLine orderLine) {
+        return orderLines.contains(orderLine);
+    }
+
+    public boolean isEmpty() {
+        return orderLines.isEmpty();
+    }
 }
