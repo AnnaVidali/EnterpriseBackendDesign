@@ -7,7 +7,11 @@ import java.time.Instant;
 @Getter
 public abstract class DomainEvent {
 
-    // Timestamp for events
     private final Instant occurredAt = Instant.now();
+    private final DomainEventType eventType;
+
+    protected DomainEvent(DomainEventType eventType) {
+        this.eventType = eventType;
+    }
 
 }

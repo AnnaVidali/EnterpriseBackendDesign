@@ -9,6 +9,7 @@ public class OrderCancelledEvent extends DomainEvent{
     private final Long customerId;
 
     public OrderCancelledEvent(Long orderId, Long customerId) {
+        super(DomainEventType.ORDER_CANCELLED);
         this.orderId = orderId;
         this.customerId = customerId;
     }
