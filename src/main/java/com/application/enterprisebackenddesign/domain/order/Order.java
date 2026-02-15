@@ -1,9 +1,9 @@
 package com.application.enterprisebackenddesign.domain.order;
 
-import com.application.enterprisebackenddesign.domain.shared.DomainException;
-import com.application.enterprisebackenddesign.domain.shared.Money;
+import com.application.enterprisebackenddesign.domain.shared.*;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -13,13 +13,16 @@ public class Order {
     private OrderStatus status;
     private final List<OrderLine> orderLines;
     private Money totalAmount;
+    private final List<DomainEvent> events = new ArrayList<>();
 
     public Order(Long id, Long customerId, List<OrderLine> orderLines) {
         this.id = id;
         this.customerId = customerId;
         this.status = OrderStatus.CREATED;
-        this.orderLines = orderLines;
+        this.orderLines = orderLines != null ? new ArrayList<>(orderLines) : new ArrayList<>();
         this.totalAmount = calculateTotal();
+
+        events.add(new OrderCreatedEvent(id, customerId, this.orderLines.size()));
     }
 
     public void addLine(OrderLine orderLine) throws DomainException.BusinessRuleViolationException {
@@ -55,6 +58,15 @@ public class Order {
             totalAmount = calculateTotal();
         } else {
             throw new DomainException.BusinessRuleViolationException("Cannot remove line from order with status: " + status);
+        }
+    }
+
+    public void confirmOrder() throws DomainException {
+        if(status == OrderStatus.CREATED && !orderLines.isEmpty()){
+            status = OrderStatus.CONFIRMED;
+            events.add(new OrderConfirmedEvent(id, customerId));
+        } else {
+            throw new DomainException("Cannot confirm order. Order status is " + status);
         }
     }
 }
