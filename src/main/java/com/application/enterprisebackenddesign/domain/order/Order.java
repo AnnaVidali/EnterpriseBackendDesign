@@ -112,8 +112,7 @@ public class Order {
             return Money.zero();
         }
         for(OrderLine orderLine : orderLines){
-            Money subtotal = orderLine.getPrice().multiply(orderLine.getQuantity());
-            total = total.add(subtotal);
+            total = total.add(orderLine.getSubtotal());
         }
         return total;
     }
