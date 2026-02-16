@@ -9,7 +9,7 @@ public class OrderLine {
 
     private final Long id;
     private final Long productId;
-    private int quantity;
+    private final int quantity;
     private final Money price;
 
     public OrderLine(Long id, Long productId, int quantity, Money price) throws DomainException.BusinessRuleViolationException {
@@ -31,14 +31,36 @@ public class OrderLine {
         this.price = price;
     }
 
-    public OrderLine withQuantity(int newQuantity) {
-        if (newQuantity < 0) {
-            throw new IllegalArgumentException("Quantity cannot be negative");
+    public OrderLine withQuantity(int newQuantity) throws DomainException.BusinessRuleViolationException {
+        if (newQuantity <= 0) {
+            throw new DomainException.BusinessRuleViolationException("Quantity must be greater than zero.");
         }
         return new OrderLine(this.id, this.productId, newQuantity, this.price);
     }
 
     public Money getSubtotal() {
         return price.multiply(quantity);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof OrderLine that)) return false;
+        return id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "OrderLine {\n" +
+                "\tid = " + id +
+                ",\n\tproductId = " + productId +
+                ",\n\tquantity = " + quantity +
+                ",\n\tprice = " + price +
+                "\n}";
     }
 }
