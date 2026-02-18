@@ -67,11 +67,10 @@ public class Money implements Comparable<Money> {
         }
     }
 
+    @Override
     public int compareTo(Money other) {
-        try {
-            assertSameCurrency(other);
-        } catch (DomainException.BusinessRuleViolationException e) {
-            throw new IllegalArgumentException("Currencies do not match.", e);
+        if (!other.getCurrency().equals(currency)) {
+            throw new IllegalArgumentException("Currencies do not match.");
         }
         return amount.compareTo(other.amount);
     }
@@ -82,6 +81,7 @@ public class Money implements Comparable<Money> {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Money money = (Money) o;
         return Objects.equals(amount, money.amount) && Objects.equals(currency, money.currency);
