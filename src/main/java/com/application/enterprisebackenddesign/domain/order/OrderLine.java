@@ -38,7 +38,7 @@ public class OrderLine {
         return new OrderLine(this.id, this.productId, newQuantity, this.price);
     }
 
-    public Money getSubtotal() {
+    public Money getSubtotal() throws DomainException.BusinessRuleViolationException {
         return price.multiply(quantity);
     }
 
