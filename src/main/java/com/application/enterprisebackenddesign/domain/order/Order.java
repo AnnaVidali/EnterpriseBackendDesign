@@ -4,6 +4,7 @@ import com.application.enterprisebackenddesign.domain.shared.*;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 
 @Getter
@@ -13,9 +14,10 @@ public class Order {
     private OrderStatus status;
     private final List<OrderLine> orderLines;
     private Money totalAmount;
+    private final Currency currency;
     private final List<DomainEvent> events = new ArrayList<>();
 
-    public Order(Long id, Long customerId, List<OrderLine> orderLines) throws DomainException.BusinessRuleViolationException {
+    public Order(Long id, Long customerId, List<OrderLine> orderLines, Currency currency) throws DomainException.BusinessRuleViolationException {
 
         if(id == null){
             throw new DomainException.BusinessRuleViolationException("Id cannot be null.");
@@ -28,10 +30,13 @@ public class Order {
         if(orderLines == null){
             throw new DomainException.BusinessRuleViolationException("Order line id cannot be null.");
         }
+        if(currency == null){
+            throw new DomainException.BusinessRuleViolationException("Currency cannot be null.");
+        }
         this.status = OrderStatus.CREATED;
         this.orderLines = new ArrayList<>(orderLines);
+        this.currency = currency;
         this.totalAmount = calculateTotal();
-
         events.add(new OrderCreatedEvent(id, customerId, this.orderLines.size()));
     }
 
@@ -43,6 +48,10 @@ public class Order {
 
         if(orderLines.contains(orderLine)){
             throw new DomainException.BusinessRuleViolationException("Order line already exists.");
+        }
+
+        if(!orderLine.getPrice().getCurrency().equals(currency)){
+            throw new DomainException.BusinessRuleViolationException("Order line price does not match currency.");
         }
 
         if(status == OrderStatus.CREATED) {
@@ -73,25 +82,25 @@ public class Order {
         }
     }
 
-    public void confirmOrder() throws DomainException {
+    public void confirmOrder() throws DomainException.BusinessRuleViolationException {
 
         if(status == OrderStatus.CREATED && !orderLines.isEmpty()){
             status = OrderStatus.CONFIRMED;
             totalAmount = calculateTotal();
             events.add(new OrderConfirmedEvent(id, customerId));
         } else {
-            throw new DomainException("Cannot confirm order. Current status: " + status + ", lines count: " + orderLines.size());
+            throw new DomainException.BusinessRuleViolationException("Cannot confirm order. Current status: " + status + ", lines count: " + orderLines.size());
         }
     }
 
-    public void cancelOrder() throws DomainException {
+    public void cancelOrder() throws DomainException.BusinessRuleViolationException {
 
         if(status == OrderStatus.CREATED || status == OrderStatus.CONFIRMED){
             status = OrderStatus.CANCELLED;
             totalAmount = calculateTotal();
             events.add(new OrderCancelledEvent(id, customerId));
         } else {
-            throw new DomainException("Cannot cancel order. Current status: " + status);
+            throw new DomainException.BusinessRuleViolationException("Cannot cancel order. Current status: " + status);
         }
     }
 
@@ -104,31 +113,36 @@ public class Order {
         return copiedEvents;
     }
 
-    private Money calculateTotal() {
+    private Money calculateTotal() throws DomainException.BusinessRuleViolationException {
 
-        Money total = Money.zero();
+        Money total = Money.zero(currency);
 
-        if(orderLines.isEmpty()){
-            return Money.zero();
-        }
         for(OrderLine orderLine : orderLines){
-            Money subtotal = orderLine.getPrice().multiply(orderLine.getQuantity());
-            total = total.add(subtotal);
+            if (!orderLine.getPrice().getCurrency().equals(currency)) {
+                throw new DomainException.BusinessRuleViolationException(
+                        "Order line price currency (" + orderLine.getPrice().getCurrency() +
+                                ") does not match order currency (" + currency + ")."
+                );
+            }
+            total = total.add(orderLine.getSubtotal());
         }
         return total;
     }
 
-    public void updateOrderLines(OrderLine orderLine, int newQuantity) throws DomainException {
+    public void updateOrderLines(OrderLine orderLine, int newQuantity) throws DomainException.BusinessRuleViolationException {
 
         if(orderLine == null){
-            throw new DomainException("Order line cannot be null.");
+            throw new DomainException.BusinessRuleViolationException("Order line cannot be null.");
+        }
+        if(!orderLine.getPrice().getCurrency().equals(currency)){
+            throw new DomainException.BusinessRuleViolationException("Order line price does not match currency.");
         }
         if(status == OrderStatus.CREATED){
             if(!orderLines.contains(orderLine)){
-                throw new DomainException("Order line does not exist.");
+                throw new DomainException.BusinessRuleViolationException("Order line does not exist.");
             }
             if(newQuantity < 0){
-                throw new DomainException("New quantity cannot be negative.");
+                throw new DomainException.BusinessRuleViolationException("New quantity cannot be negative.");
             }
             int index = orderLines.indexOf(orderLine);
             int oldQuantity = orderLine.getQuantity();
@@ -141,7 +155,7 @@ public class Order {
             totalAmount = calculateTotal();
             events.add(new OrderLineUpdatedEvent(DomainEventType.ORDER_UPDATED, this.id, this.customerId, orderLine.getId(), oldQuantity, newQuantity));
         } else {
-            throw new DomainException("Cannot update orderLines. Current status: " + status);
+            throw new DomainException.BusinessRuleViolationException("Cannot update orderLines. Current status: " + status);
         }
     }
 
