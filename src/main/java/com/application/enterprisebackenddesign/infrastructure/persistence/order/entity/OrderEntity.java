@@ -1,11 +1,13 @@
 package com.application.enterprisebackenddesign.infrastructure.persistence.order.entity;
 
 import jakarta.persistence.*;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
 @Entity
 @Table(name = "Orders")
 public class OrderEntity {
@@ -33,27 +35,4 @@ public class OrderEntity {
     )
     private List<OrderLineEntity> orderLines = new ArrayList<>();
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public void setOrderLines(List<OrderLineEntity> orderLines) {
-        this.orderLines = orderLines;
-    }
 }
