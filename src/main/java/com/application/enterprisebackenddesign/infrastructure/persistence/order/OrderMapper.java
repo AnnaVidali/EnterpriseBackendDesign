@@ -9,8 +9,10 @@ import com.application.enterprisebackenddesign.infrastructure.persistence.order.
 import com.application.enterprisebackenddesign.infrastructure.persistence.shared.MoneyEmbeddable;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class OrderMapper {
@@ -25,7 +27,7 @@ public class OrderMapper {
 
         List<OrderLineEntity> orderLineEntities = order.getOrderLines().stream()
                 .map(line -> toLineEntity(line, entity))
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
 
         entity.setOrderLines(orderLineEntities);
         return entity;
