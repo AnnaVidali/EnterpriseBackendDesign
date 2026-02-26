@@ -2,9 +2,11 @@ package com.application.enterprisebackenddesign.infrastructure.persistence.order
 
 import com.application.enterprisebackenddesign.infrastructure.persistence.shared.MoneyEmbeddable;
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.Setter;
 
 @Setter
+@Getter
 @Entity
 @Table(name = "Order_Lines")
 public class OrderLineEntity {

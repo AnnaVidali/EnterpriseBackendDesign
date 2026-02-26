@@ -1,6 +1,7 @@
 package com.application.enterprisebackenddesign.infrastructure.persistence.order.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Setter
+@Getter
 @Entity
 @Table(name = "Orders")
 public class OrderEntity {
