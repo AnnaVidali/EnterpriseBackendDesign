@@ -5,5 +5,6 @@ public enum DomainEventType {
     ORDER_CONFIRMED,
     ORDER_CANCELLED,
     ORDER_BILLED,
-    ORDER_UPDATED
+    ORDER_UPDATED,
+    INVOICE_ISSUED
 }

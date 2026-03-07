@@ -170,4 +170,16 @@ public class Order {
     public boolean isEmpty() {
         return orderLines.isEmpty();
     }
+
+    @Override
+    public String toString() {
+        return "Order {\n" +
+                "\tid = " + id +
+                ",\n\tcustomerId = " + customerId +
+                ",\n\tstatus = " + status +
+                ",\n\tcurrency = " + currency +
+                ",\n\ttotalAmount = " + totalAmount +
+                ",\n\torderLines = " + orderLines +
+                "\n}";
+    }
 }
