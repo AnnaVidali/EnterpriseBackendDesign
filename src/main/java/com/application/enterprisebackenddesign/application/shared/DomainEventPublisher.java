@@ -1,4 +1,8 @@
 package com.application.enterprisebackenddesign.application.shared;
 
-public class DomainEventPublisher {
+import com.application.enterprisebackenddesign.domain.shared.DomainEvent;
+
+public interface DomainEventPublisher {
+
+    public void publish(DomainEvent event);
 }
