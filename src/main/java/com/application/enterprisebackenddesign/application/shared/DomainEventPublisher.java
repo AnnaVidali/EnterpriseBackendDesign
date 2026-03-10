@@ -4,5 +4,5 @@ import com.application.enterprisebackenddesign.domain.shared.DomainEvent;
 
 public interface DomainEventPublisher {
 
-    public void publish(DomainEvent event);
+    void publish(DomainEvent event);
 }
