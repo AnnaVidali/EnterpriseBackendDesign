@@ -5,26 +5,27 @@ import com.application.enterprisebackenddesign.domain.order.Order;
 import com.application.enterprisebackenddesign.domain.order.OrderLine;
 import com.application.enterprisebackenddesign.domain.order.OrderRepository;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
+import com.application.enterprisebackenddesign.domain.shared.Money;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.Currency;
-import java.util.List;
-
 @Service
 @Transactional
-public class CreateOrderUseCase {
+public class AddOrderLineUseCase {
+
     private final OrderRepository orderRepository;
     private final DomainEventPublisher eventPublisher;
 
-
-    public CreateOrderUseCase(OrderRepository orderRepository, DomainEventPublisher eventPublisher) {
+    public AddOrderLineUseCase(OrderRepository orderRepository, DomainEventPublisher eventPublisher) {
         this.orderRepository = orderRepository;
         this.eventPublisher = eventPublisher;
     }
 
-    public Order execute(Long id, Long customerId, List<OrderLine> orderLines, Currency currency) throws DomainException.BusinessRuleViolationException {
-        Order order = new Order(id, customerId, orderLines, currency);
+    public Order execute(Long orderId, Long orderLineId, Long productId, Money price, int quantity) throws DomainException.BusinessRuleViolationException {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new DomainException.BusinessRuleViolationException("Order not found"));
+
+        OrderLine orderLine = new OrderLine(orderLineId, productId, quantity, price);
+        order.addLine(orderLine);
 
         Order savedOrder = orderRepository.save(order);
 

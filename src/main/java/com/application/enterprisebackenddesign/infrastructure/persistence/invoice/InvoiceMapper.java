@@ -18,7 +18,7 @@ public class InvoiceMapper {
         invoiceEntity.setCustomerId(invoice.getCustomerId());
         invoiceEntity.setOrderId(invoice.getOrderId());
         invoiceEntity.setInvoiceDate(invoice.getInvoiceDate());
-        invoiceEntity.setStatus(invoice.getStatus().name());
+        invoiceEntity.setStatus(InvoiceStatus.valueOf(invoice.getStatus().name()));
         invoiceEntity.setAmount(invoice.getAmount().getAmount());
         invoiceEntity.setCurrency(invoice.getAmount().getCurrency().getCurrencyCode());
         return invoiceEntity;
@@ -26,7 +26,7 @@ public class InvoiceMapper {
 
     public Invoice toDomain(InvoiceEntity invoiceEntity) {
         try {
-            return new Invoice(invoiceEntity.getId(), invoiceEntity.getCustomerId(), invoiceEntity.getOrderId(), new Money(invoiceEntity.getAmount(), Currency.getInstance(invoiceEntity.getCurrency())), InvoiceStatus.valueOf(invoiceEntity.getStatus()), invoiceEntity.getInvoiceDate());
+            return new Invoice(invoiceEntity.getId(), invoiceEntity.getCustomerId(), invoiceEntity.getOrderId(), new Money(invoiceEntity.getAmount(), Currency.getInstance(invoiceEntity.getCurrency())), InvoiceStatus.valueOf(String.valueOf(invoiceEntity.getStatus())), invoiceEntity.getInvoiceDate());
         } catch (DomainException.BusinessRuleViolationException e) {
             throw new IllegalStateException("Corrupted invoice data in database", e);
         }
