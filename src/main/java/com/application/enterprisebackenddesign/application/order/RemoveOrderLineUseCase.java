@@ -20,8 +20,8 @@ public class RemoveOrderLineUseCase {
         this.eventPublisher = eventPublisher;
     }
 
-    public Order execute(Long orderId, Long orderLineId) throws DomainException.BusinessRuleViolationException {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new DomainException.BusinessRuleViolationException("Order not found"));
+    public Order execute(Long orderId, Long orderLineId) throws DomainException {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new DomainException.ResourceNotFoundException("Order not found"));
 
         OrderLine line = order.getOrderLines().stream()
                 .filter(l -> l.getId().equals(orderLineId))

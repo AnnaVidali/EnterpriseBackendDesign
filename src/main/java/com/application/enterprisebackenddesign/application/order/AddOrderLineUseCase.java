@@ -21,8 +21,8 @@ public class AddOrderLineUseCase {
         this.eventPublisher = eventPublisher;
     }
 
-    public Order execute(Long orderId, Long orderLineId, Long productId, Money price, int quantity) throws DomainException.BusinessRuleViolationException {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new DomainException.BusinessRuleViolationException("Order not found"));
+    public Order execute(Long orderId, Long orderLineId, Long productId, Money price, int quantity) throws DomainException {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new DomainException.ResourceNotFoundException("Order not found"));
 
         OrderLine orderLine = new OrderLine(orderLineId, productId, quantity, price);
         order.addLine(orderLine);

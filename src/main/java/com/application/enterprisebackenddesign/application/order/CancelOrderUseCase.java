@@ -19,8 +19,8 @@ public class CancelOrderUseCase {
         this.eventPublisher = eventPublisher;
     }
 
-    public Order execute (Long orderId) throws DomainException.BusinessRuleViolationException {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new DomainException.BusinessRuleViolationException("Order not found"));
+    public Order execute (Long orderId) throws DomainException {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new DomainException.ResourceNotFoundException("Order not found"));
 
         order.cancelOrder();
 

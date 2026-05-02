@@ -23,7 +23,7 @@ public class CreateOrderUseCase {
         this.eventPublisher = eventPublisher;
     }
 
-    public Order execute(Long id, Long customerId, List<OrderLine> orderLines, Currency currency) throws DomainException.BusinessRuleViolationException {
+    public Order execute(Long id, Long customerId, List<OrderLine> orderLines, Currency currency) throws DomainException {
         Order order = new Order(id, customerId, orderLines, currency);
 
         Order savedOrder = orderRepository.save(order);
