@@ -28,7 +28,7 @@ public class IssueInvoiceUseCase {
     }
 
     public Invoice execute (Long orderId) throws DomainException {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new DomainException.BusinessRuleViolationException("Order not found"));
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new DomainException.ResourceNotFoundException("Order not found"));
 
         if(order.getStatus() != OrderStatus.CONFIRMED){
             throw new DomainException.BusinessRuleViolationException("Order status is not CONFIRMED");

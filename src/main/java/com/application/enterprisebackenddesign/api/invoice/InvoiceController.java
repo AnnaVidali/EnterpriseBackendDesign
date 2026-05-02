@@ -1,7 +1,6 @@
 package com.application.enterprisebackenddesign.api.invoice;
 
 import com.application.enterprisebackenddesign.application.invoice.IssueInvoiceUseCase;
-import com.application.enterprisebackenddesign.application.invoice.PayInvoiceUseCase;
 import com.application.enterprisebackenddesign.domain.invoice.Invoice;
 import com.application.enterprisebackenddesign.domain.invoice.InvoiceRepository;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
@@ -12,16 +11,13 @@ import org.springframework.web.bind.annotation.*;
 public class InvoiceController {
 
     private final IssueInvoiceUseCase issueInvoiceUseCase;
-    private final PayInvoiceUseCase payInvoiceUseCase;
     private final InvoiceMapper invoiceMapper;
     private final InvoiceRepository invoiceRepository;
 
     public InvoiceController(IssueInvoiceUseCase issueInvoiceUseCase,
-                             PayInvoiceUseCase payInvoiceUseCase,
                              InvoiceMapper invoiceMapper,
                              InvoiceRepository invoiceRepository) {
         this.issueInvoiceUseCase = issueInvoiceUseCase;
-        this.payInvoiceUseCase = payInvoiceUseCase;
         this.invoiceMapper = invoiceMapper;
         this.invoiceRepository = invoiceRepository;
     }
@@ -36,12 +32,6 @@ public class InvoiceController {
     @PostMapping("/issue/{orderId}")
     public InvoiceResponse issueInvoice(@PathVariable Long orderId) throws DomainException {
         Invoice invoice = issueInvoiceUseCase.execute(orderId);
-        return invoiceMapper.toResponse(invoice);
-    }
-
-    @PostMapping("/{id}/pay")
-    public InvoiceResponse payInvoice(@PathVariable Long id) throws DomainException {
-        Invoice invoice = payInvoiceUseCase.execute(id);
         return invoiceMapper.toResponse(invoice);
     }
 }
