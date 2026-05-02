@@ -21,9 +21,6 @@ public class Payment {
     private final List<DomainEvent> events = new ArrayList<>();
 
     public Payment(Long id, Long invoiceId, Long orderId, Long customerId, Money amount, PaymentStatus status) throws DomainException.BusinessRuleViolationException {
-        if(id == null){
-            throw new DomainException.BusinessRuleViolationException("Id cannot be null.");
-        }
         this.id = id;
         if(invoiceId == null){
             throw new DomainException.BusinessRuleViolationException("Invoice id cannot be null.");

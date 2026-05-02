@@ -63,6 +63,7 @@ public class Invoice {
             throw new DomainException.BusinessRuleViolationException("Only ISSUED invoices can be marked as PAID.");
         }
         status = InvoiceStatus.PAID;
+        events.add(new com.application.enterprisebackenddesign.domain.shared.OrderBilledEvent(orderId, customerId, amount));
     }
 
     public void cancel() throws DomainException.BusinessRuleViolationException {
@@ -85,6 +86,14 @@ public class Invoice {
 
     public void clearEvents() {
         events.clear();
+    }
+
+    public List<DomainEvent> pullEvents(boolean clear) {
+        List<DomainEvent> copiedEvents = new ArrayList<>(events);
+        if (clear) {
+            clearEvents();
+        }
+        return copiedEvents;
     }
 
     @Override
