@@ -1,6 +1,7 @@
 package com.application.enterprisebackenddesign.infrastructure.persistence.payment.entity;
 
 import com.application.enterprisebackenddesign.domain.invoice.InvoiceStatus;
+import com.application.enterprisebackenddesign.domain.payment.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,12 @@ public class PaymentEntity {
     private Long invoiceId;
 
     @Column(nullable = false)
+    private Long orderId;
+
+    @Column(nullable = false)
+    private Long customerId;
+
+    @Column(nullable = false)
     private String currency;
 
     @Column(nullable = false, precision = 19, scale = 2)
@@ -28,7 +35,7 @@ public class PaymentEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private InvoiceStatus status;
+    private PaymentStatus status;
 
     @Column
     private LocalDateTime paymentDate;
