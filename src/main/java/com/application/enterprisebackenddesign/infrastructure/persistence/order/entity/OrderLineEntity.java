@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "Order_Lines")
+@Table(name = "order_lines")
 public class OrderLineEntity {
     @Id
     private Long id;
