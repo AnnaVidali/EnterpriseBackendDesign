@@ -1,11 +1,11 @@
 CREATE TABLE invoices (
-    id int primary key,
-    customer_id int not null,
-    order_id int not null,
+    id bigint primary key,
+    customer_id bigint not null,
+    order_id bigint not null,
     currency varchar(3) not null,
-    amount decimal(10,2) not null,
+    amount decimal(19,2) not null,
     status varchar(255) not null,
-    invoice_date date,
+    invoice_date timestamp,
     constraint fk_invoices_customer foreign key (customer_id) references customers(id),
     constraint fk_invoices_order foreign key (order_id) references orders(id)
 );
