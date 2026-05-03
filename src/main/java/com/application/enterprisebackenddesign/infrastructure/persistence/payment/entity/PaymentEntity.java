@@ -1,6 +1,7 @@
-package com.application.enterprisebackenddesign.infrastructure.persistence.invoice.entity;
+package com.application.enterprisebackenddesign.infrastructure.persistence.payment.entity;
 
 import com.application.enterprisebackenddesign.domain.invoice.InvoiceStatus;
+import com.application.enterprisebackenddesign.domain.payment.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,20 +9,23 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Setter
 @Getter
+@Setter
 @Entity
-@Table(name = "invoices")
-public class InvoiceEntity {
+@Table(name = "payments")
+public class PaymentEntity {
 
     @Id
     private Long id;
 
     @Column(nullable = false)
-    private Long customerId;
+    private Long invoiceId;
 
     @Column(nullable = false)
     private Long orderId;
+
+    @Column(nullable = false)
+    private Long customerId;
 
     @Column(nullable = false)
     private String currency;
@@ -31,8 +35,8 @@ public class InvoiceEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private InvoiceStatus status;
+    private PaymentStatus status;
 
     @Column
-    private LocalDateTime invoiceDate;
+    private LocalDateTime paymentDate;
 }

@@ -12,4 +12,16 @@ public class DomainException extends Exception {
         }
     }
 
+    public static class ResourceNotFoundException extends DomainException {
+        public ResourceNotFoundException(String message) {
+            super(message);
+        }
+    }
+
+    public static class InvalidStateException extends DomainException {
+        public InvalidStateException(String message) {
+            super(message);
+        }
+    }
+
 }

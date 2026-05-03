@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: enterprise-postgres
+    environment:
+      POSTGRES_DB: enterprise_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:
