@@ -1,7 +1,11 @@
 CREATE TABLE customers (
-    id int primary key,
+    id int auto_increment primary key,
     name varchar(255) not null,
-    email varchar(255) not null unique
+    last_name varchar(255) not null,
+    email varchar(255) not null unique,
+    created_date datetime not null,
+    last_modified_date datetime not null,
+    version bigint default 0
 );
 
 CREATE TABLE products (
