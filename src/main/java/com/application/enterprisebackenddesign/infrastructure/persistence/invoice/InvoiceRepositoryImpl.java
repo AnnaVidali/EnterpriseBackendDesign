@@ -19,8 +19,7 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
         this.repository = repository;
         this.invoiceMapper = invoiceMapper;
     }
-
-
+    
     @Override
     public Invoice save(Invoice invoice) {
         InvoiceEntity entity = invoiceMapper.toEntity(invoice);
