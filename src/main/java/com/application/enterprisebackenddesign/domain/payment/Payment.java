@@ -21,12 +21,21 @@ public class Payment {
     private final List<DomainEvent> events = new ArrayList<>();
 
     public Payment(Long id, Long invoiceId, Long orderId, Long customerId, Money amount, PaymentStatus status) throws DomainException.BusinessRuleViolationException {
+        if(id == null){
+            throw new DomainException.BusinessRuleViolationException("Id cannot be null.");
+        }
         this.id = id;
         if(invoiceId == null){
             throw new DomainException.BusinessRuleViolationException("Invoice id cannot be null.");
         }
         this.invoiceId = invoiceId;
+        if(orderId == null){
+            throw new DomainException.BusinessRuleViolationException("Order id cannot be null.");
+        }
         this.orderId = orderId;
+        if(customerId == null){
+            throw new DomainException.BusinessRuleViolationException("Customer id cannot be null.");
+        }
         this.customerId = customerId;
         if (amount == null || amount.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new DomainException.BusinessRuleViolationException("Amount must be greater than zero.");
