@@ -53,8 +53,7 @@ public class IssueInvoiceUseCase {
         invoiceToSave.issue();
 
         Invoice savedInvoice = invoiceRepository.save(invoiceToSave);
-        savedInvoice.getEvents().forEach(eventPublisher::publish);
-        savedInvoice.clearEvents();
+        invoiceToSave.pullEvents(true).forEach(eventPublisher::publish);
 
         return savedInvoice;
     }

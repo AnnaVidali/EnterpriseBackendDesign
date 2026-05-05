@@ -7,7 +7,6 @@ import com.application.enterprisebackenddesign.domain.shared.Money;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -42,7 +41,7 @@ public class OrderController {
 
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
-    public OrderResponse createOrder(@RequestBody CreateOrderRequest request) throws DomainException.BusinessRuleViolationException {
+    public OrderResponse createOrder(@RequestBody CreateOrderRequest request) throws DomainException {
         Currency currency = Currency.getInstance(request.currency());
 
         var lines = request.lines().stream()
@@ -54,19 +53,19 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/confirm")
-    public OrderResponse confirmOrder(@PathVariable Long id) throws DomainException.BusinessRuleViolationException {
+    public OrderResponse confirmOrder(@PathVariable Long id) throws DomainException {
         Order order = confirmOrderUseCase.execute(id);
         return orderMapper.toResponse(order);
     }
 
     @PostMapping("/{id}/cancel")
-    public OrderResponse cancelOrder(@PathVariable Long id) throws DomainException.BusinessRuleViolationException {
+    public OrderResponse cancelOrder(@PathVariable Long id) throws DomainException {
         Order order = cancelOrderUseCase.execute(id);
         return orderMapper.toResponse(order);
     }
 
     @PostMapping("/{id}/lines")
-    public OrderResponse addLine(@PathVariable Long id, @RequestBody OrderLineRequest request) throws DomainException.BusinessRuleViolationException {
+    public OrderResponse addLine(@PathVariable Long id, @RequestBody OrderLineRequest request) throws DomainException {
         Currency currency = Currency.getInstance("USD");
         Money price = new Money(request.price(), currency);
         Order order = addOrderLineUseCase.execute(id, UUID.randomUUID().getMostSignificantBits(), request.productId(), price, request.quantity());
@@ -74,13 +73,13 @@ public class OrderController {
     }
 
     @PutMapping("/{id}/lines/{lineId}")
-    public OrderResponse updateLine(@PathVariable Long id, @PathVariable Long lineId, @RequestBody OrderLineRequest request) throws DomainException.BusinessRuleViolationException {
+    public OrderResponse updateLine(@PathVariable Long id, @PathVariable Long lineId, @RequestBody OrderLineRequest request) throws DomainException {
         Order order = updateOrderLineUseCase.execute(id, lineId, request.quantity());
         return orderMapper.toResponse(order);
     }
 
     @DeleteMapping("/{id}/lines/{lineId}")
-    public OrderResponse removeLine(@PathVariable Long id, @PathVariable Long lineId) throws DomainException.BusinessRuleViolationException {
+    public OrderResponse removeLine(@PathVariable Long id, @PathVariable Long lineId) throws DomainException {
         Order order = removeOrderLineUseCase.execute(id, lineId);
         return orderMapper.toResponse(order);
     }
