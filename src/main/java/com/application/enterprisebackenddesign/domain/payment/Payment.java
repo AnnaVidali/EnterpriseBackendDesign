@@ -46,7 +46,7 @@ public class Payment {
         }
         this.status = status;
         this.paymentDate = null;
-        events.add(new PaymentPendingEvent(id, invoiceId, amount));
+        events.add(new PaymentPendingEvent(this.id, this.invoiceId, this.amount));
     }
 
     public void complete() throws DomainException.BusinessRuleViolationException {

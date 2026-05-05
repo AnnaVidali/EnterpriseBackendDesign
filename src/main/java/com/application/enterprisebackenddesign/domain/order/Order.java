@@ -37,7 +37,7 @@ public class Order {
         this.orderLines = new ArrayList<>(orderLines);
         this.currency = currency;
         this.totalAmount = calculateTotal();
-        events.add(new OrderCreatedEvent(id, customerId, this.orderLines.size()));
+        events.add(new OrderCreatedEvent(this.id, this.customerId, this.orderLines.size()));
     }
 
     public void addLine(OrderLine orderLine) throws DomainException.BusinessRuleViolationException {
