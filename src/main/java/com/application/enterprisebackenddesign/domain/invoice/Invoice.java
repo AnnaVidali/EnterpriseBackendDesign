@@ -1,9 +1,6 @@
 package com.application.enterprisebackenddesign.domain.invoice;
 
-import com.application.enterprisebackenddesign.domain.shared.DomainEvent;
-import com.application.enterprisebackenddesign.domain.shared.DomainException;
-import com.application.enterprisebackenddesign.domain.shared.InvoiceIssuedEvent;
-import com.application.enterprisebackenddesign.domain.shared.Money;
+import com.application.enterprisebackenddesign.domain.shared.*;
 import lombok.Getter;
 
 import java.math.BigDecimal;
@@ -47,6 +44,7 @@ public class Invoice {
             throw new DomainException.BusinessRuleViolationException("Issued or paid invoices must have an invoice date.");
         }
         this.invoiceDate = invoiceDate;
+        events.add(new InvoiceCreatedEvent(this.id, this.customerId, this.orderId, this.amount, this.status));
     }
 
     public void issue() throws DomainException.BusinessRuleViolationException {
