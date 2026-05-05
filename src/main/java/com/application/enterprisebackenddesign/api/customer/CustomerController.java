@@ -39,8 +39,8 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}")
-    public CustomerResponse getCustomer(@PathVariable Long customerId) throws DomainException {
-        Customer customer = getCustomerUseCase.getById(customerId);
+    public CustomerResponse getCustomer(@PathVariable Long id) throws DomainException {
+        Customer customer = getCustomerUseCase.getById(id);
         return customerMapper.toResponse(customer);
     }
 
