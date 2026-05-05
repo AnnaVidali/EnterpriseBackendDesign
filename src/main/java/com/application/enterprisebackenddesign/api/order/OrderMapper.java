@@ -6,7 +6,6 @@ import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import com.application.enterprisebackenddesign.domain.shared.Money;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.stream.Collectors;
 
