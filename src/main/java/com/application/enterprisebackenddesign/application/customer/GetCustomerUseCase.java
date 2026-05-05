@@ -1,6 +1,5 @@
 package com.application.enterprisebackenddesign.application.customer;
 
-import com.application.enterprisebackenddesign.application.shared.DomainEventPublisher;
 import com.application.enterprisebackenddesign.domain.customer.Customer;
 import com.application.enterprisebackenddesign.domain.customer.CustomerRepository;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
