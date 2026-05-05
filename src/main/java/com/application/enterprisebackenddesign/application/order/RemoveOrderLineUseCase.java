@@ -32,7 +32,7 @@ public class RemoveOrderLineUseCase {
 
         Order savedOrder = orderRepository.save(order);
 
-        savedOrder.pullEvents(true).forEach(eventPublisher::publish);
+        order.pullEvents(true).forEach(eventPublisher::publish);
 
         return savedOrder;
     }
