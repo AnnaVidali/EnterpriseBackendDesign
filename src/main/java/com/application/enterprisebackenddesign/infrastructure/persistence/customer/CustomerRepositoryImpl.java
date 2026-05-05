@@ -3,10 +3,12 @@ package com.application.enterprisebackenddesign.infrastructure.persistence.custo
 import com.application.enterprisebackenddesign.domain.customer.Customer;
 import com.application.enterprisebackenddesign.domain.customer.CustomerRepository;
 import com.application.enterprisebackenddesign.infrastructure.persistence.customer.entity.CustomerEntity;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public class CustomerRepositoryImpl implements CustomerRepository {
 
     private final SpringDataCustomerRepository customerRepository;
