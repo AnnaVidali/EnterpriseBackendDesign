@@ -1,8 +1,13 @@
 package com.application.enterprisebackenddesign.domain.customer;
 
+import com.application.enterprisebackenddesign.domain.shared.CustomerCreatedEvent;
+import com.application.enterprisebackenddesign.domain.shared.CustomerUpdatedEvent;
+import com.application.enterprisebackenddesign.domain.shared.DomainEvent;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 @Getter
@@ -12,6 +17,7 @@ public class Customer {
     private String name;
     private String lastName;
     private String email;
+    private final List<DomainEvent> events = new ArrayList<>();
 
     public Customer(Long id, String name, String lastName, String email) throws DomainException.BusinessRuleViolationException {
         if (id == null) {
@@ -30,6 +36,7 @@ public class Customer {
             throw new DomainException.BusinessRuleViolationException("Email address has invalid format.");
         }
         this.email = email;
+        events.add(new CustomerCreatedEvent(this.id, this.name, this.lastName, this.email));
     }
 
     private Boolean isEmailValid(String email) {
@@ -46,6 +53,7 @@ public class Customer {
         if (!isEmailValid(newEmail)) {
             throw new DomainException.BusinessRuleViolationException("Email address has invalid format.");
         }
+        events.add(new CustomerUpdatedEvent(this.id, "email", this.email, newEmail));
         this.email = newEmail;
     }
 
@@ -53,6 +61,7 @@ public class Customer {
         if (newName == null || newName.isEmpty()) {
             throw new DomainException.BusinessRuleViolationException("Name cannot be null or empty.");
         }
+        events.add(new CustomerUpdatedEvent(this.id, "name", this.name, newName));
         this.name = newName;
     }
 
@@ -60,6 +69,16 @@ public class Customer {
         if (newLastName == null || newLastName.isEmpty()) {
             throw new DomainException.BusinessRuleViolationException("Last name cannot be null or empty.");
         }
+        events.add(new CustomerUpdatedEvent(this.id, "lastName", this.lastName, newLastName));
         this.lastName = newLastName;
+    }
+
+    public List<DomainEvent> pullEvents(boolean clear) {
+
+        List<DomainEvent> copiedEvents = new ArrayList<>(events);
+        if(clear) {
+            events.clear();
+        }
+        return copiedEvents;
     }
 }
