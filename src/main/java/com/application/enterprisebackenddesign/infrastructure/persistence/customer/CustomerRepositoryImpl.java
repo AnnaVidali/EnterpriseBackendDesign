@@ -43,4 +43,9 @@ public class CustomerRepositoryImpl implements CustomerRepository {
                 .map(customerMapper::toDomain)
                 .toList();
     }
+
+    @Override
+    public void deleteById(Long customerId) {
+        customerRepository.deleteById(customerId);
+    }
 }

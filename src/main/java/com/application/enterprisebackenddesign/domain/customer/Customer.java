@@ -1,9 +1,6 @@
 package com.application.enterprisebackenddesign.domain.customer;
 
-import com.application.enterprisebackenddesign.domain.shared.CustomerCreatedEvent;
-import com.application.enterprisebackenddesign.domain.shared.CustomerUpdatedEvent;
-import com.application.enterprisebackenddesign.domain.shared.DomainEvent;
-import com.application.enterprisebackenddesign.domain.shared.DomainException;
+import com.application.enterprisebackenddesign.domain.shared.*;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -74,11 +71,15 @@ public class Customer {
     }
 
     public List<DomainEvent> pullEvents(boolean clear) {
-
+        
         List<DomainEvent> copiedEvents = new ArrayList<>(events);
         if(clear) {
             events.clear();
         }
         return copiedEvents;
+    }
+
+    public void delete() {
+        events.add(new CustomerDeletedEvent(this.id));
     }
 }
