@@ -1,8 +1,10 @@
 package com.application.enterprisebackenddesign.domain.product;
 
-import com.application.enterprisebackenddesign.domain.shared.DomainException;
-import com.application.enterprisebackenddesign.domain.shared.Money;
+import com.application.enterprisebackenddesign.domain.shared.*;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class Product {
@@ -11,6 +13,7 @@ public class Product {
     private String name;
     private Money price;
     private String sku;
+    private final List<DomainEvent> events = new ArrayList<>();
 
     public Product(Long id, String name, Money price, String sku) throws DomainException.BusinessRuleViolationException {
         if(id == null){
@@ -32,23 +35,44 @@ public class Product {
             throw new DomainException.BusinessRuleViolationException("Sku format is invalid.");
         }
         this.sku = sku.toUpperCase();
+        events.add(new ProductCreatedEvent(id, name, price, sku));
     }
 
-    public Money updatePrice(Money newPrice){
+    public void updatePrice(Money newPrice) throws DomainException {
+        if (newPrice == null || newPrice.isZero()) {
+            throw new DomainException.BusinessRuleViolationException("New price cannot be null or zero.");
+        }
         Money oldPrice = this.price;
         this.price = newPrice;
-        return oldPrice;
+        events.add(new ProductUpdatedEvent(id, "price", oldPrice, newPrice));
     }
 
-    public String updateName(String name){
+    public void updateName(String newName) throws DomainException {
+        if (newName == null || newName.isEmpty()) {
+            throw new DomainException.BusinessRuleViolationException("New name cannot be null or empty.");
+        }
         String oldName = this.name;
-        this.name = name;
-        return oldName;
+        this.name = newName;
+        events.add(new ProductUpdatedEvent(id, "name", oldName, newName));
     }
 
-    public String updateSku(String sku){
+    public void updateSku(String newSku) throws DomainException {
+        if (newSku == null || newSku.isEmpty()) {
+            throw new DomainException.BusinessRuleViolationException("New sku cannot be null or empty.");
+        }
+        if (newSku.startsWith("0") || newSku.contains("@") || newSku.contains("&") || newSku.contains("<") || newSku.contains(">")) {
+            throw new DomainException.BusinessRuleViolationException("New sku format is invalid.");
+        }
         String oldSku = this.sku;
-        this.sku = sku;
-        return oldSku;
+        this.sku = newSku.toUpperCase();
+        events.add(new ProductUpdatedEvent(id, "sku", oldSku, newSku));
+    }
+
+    public List<DomainEvent> pullEvents(boolean clear) {
+        List<DomainEvent> copiedEvents = new ArrayList<>(events);
+        if(clear) {
+            events.clear();
+        }
+        return copiedEvents;
     }
 }
