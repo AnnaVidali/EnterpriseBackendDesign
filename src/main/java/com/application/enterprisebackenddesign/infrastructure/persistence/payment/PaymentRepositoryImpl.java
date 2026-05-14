@@ -5,7 +5,6 @@ import com.application.enterprisebackenddesign.domain.payment.PaymentRepository;
 import com.application.enterprisebackenddesign.infrastructure.persistence.payment.entity.PaymentEntity;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -31,8 +30,4 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         return paymentRepository.findById(id).map(paymentMapper::toDomain);
     }
 
-    @Override
-    public List<Payment> findByInvoiceId(Long invoiceId) {
-        return paymentRepository.findByInvoiceId(invoiceId).stream().map(paymentMapper::toDomain).toList();
-    }
 }

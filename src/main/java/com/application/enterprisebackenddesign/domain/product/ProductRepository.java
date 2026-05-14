@@ -7,13 +7,13 @@ import java.util.Optional;
 
 public interface ProductRepository {
 
-    public List<Product> findAll();
+    List<Product> findAll();
 
-    public Optional<Product> findById(Long id);
+    Optional<Product> findById(Long id);
 
-    public Product save(Product product) throws DomainException;
+    Product save(Product product) throws DomainException;
 
-    public Optional<Product> findBySku(String sku);
+    Optional<Product> findBySku(String sku);
 
-    public void delete(Product product);
+    void delete(Product product);
 }

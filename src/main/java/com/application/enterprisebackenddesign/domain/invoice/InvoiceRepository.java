@@ -19,7 +19,4 @@ public interface InvoiceRepository {
 
     List<Invoice> findAll();
 
-    void deleteById(Long id);
-
-    boolean existsById(Long id);
 }

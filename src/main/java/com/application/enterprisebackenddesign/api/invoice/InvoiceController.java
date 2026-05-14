@@ -1,13 +1,10 @@
 package com.application.enterprisebackenddesign.api.invoice;
 
-import com.application.enterprisebackenddesign.api.order.OrderResponse;
 import com.application.enterprisebackenddesign.application.invoice.IssueInvoiceUseCase;
 import com.application.enterprisebackenddesign.application.invoice.ListInvoicesUseCase;
 import com.application.enterprisebackenddesign.domain.invoice.Invoice;
 import com.application.enterprisebackenddesign.domain.invoice.InvoiceRepository;
 import com.application.enterprisebackenddesign.domain.invoice.InvoiceStatus;
-import com.application.enterprisebackenddesign.domain.order.Order;
-import com.application.enterprisebackenddesign.domain.order.OrderStatus;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import org.springframework.web.bind.annotation.*;
 

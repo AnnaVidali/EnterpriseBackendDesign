@@ -1,5 +1,8 @@
 package com.application.enterprisebackenddesign.domain.shared;
 
+import lombok.Getter;
+
+@Getter
 public class PaymentPendingEvent extends DomainEvent{
 
     private final Long paymentId;

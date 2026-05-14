@@ -18,10 +18,4 @@ public class DomainException extends Exception {
         }
     }
 
-    public static class InvalidStateException extends DomainException {
-        public InvalidStateException(String message) {
-            super(message);
-        }
-    }
-
 }

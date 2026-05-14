@@ -32,11 +32,6 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     }
 
     @Override
-    public Optional<Customer> findByEmail(String email) {
-        return customerRepository.findByEmail(email).map(customerMapper::toDomain);
-    }
-
-    @Override
     public List<Customer> findAll() {
         return customerRepository.findAll()
                 .stream()

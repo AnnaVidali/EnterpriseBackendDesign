@@ -9,11 +9,7 @@ public interface OrderRepository {
 
     Optional<Order> findById(Long orderId);
 
-    void deleteById(Long orderId);
-
     List<Order> findByStatus(OrderStatus status);
-
-    boolean existsById(Long orderId);
 
     List<Order> findAll();
 

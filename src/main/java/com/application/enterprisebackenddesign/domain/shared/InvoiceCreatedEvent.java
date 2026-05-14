@@ -1,7 +1,9 @@
 package com.application.enterprisebackenddesign.domain.shared;
 
 import com.application.enterprisebackenddesign.domain.invoice.InvoiceStatus;
+import lombok.Getter;
 
+@Getter
 public class InvoiceCreatedEvent extends DomainEvent {
 
     private final Long id;
