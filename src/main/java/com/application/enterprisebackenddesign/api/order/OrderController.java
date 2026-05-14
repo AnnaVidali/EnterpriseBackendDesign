@@ -72,7 +72,7 @@ public class OrderController {
 
     @PostMapping("/{id}/lines")
     public OrderResponse addLine(@PathVariable Long id, @RequestBody OrderLineRequest request) throws DomainException {
-        Currency currency = Currency.getInstance("EUR");
+        Currency currency = Currency.getInstance(request.currency());
         Money price = new Money(request.price(), currency);
         Order order = addOrderLineUseCase.execute(id, UUID.randomUUID().getMostSignificantBits(), request.productId(), price, request.quantity());
         return orderMapper.toResponse(order);
