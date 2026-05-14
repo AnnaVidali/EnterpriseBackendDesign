@@ -39,7 +39,7 @@ public class OrderController {
         this.orderMapper = orderMapper;
     }
 
-    @PostMapping("/")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OrderResponse createOrder(@RequestBody CreateOrderRequest request) throws DomainException {
         Currency currency = Currency.getInstance(request.currency());

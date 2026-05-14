@@ -31,7 +31,7 @@ public class CustomerController {
         this.customerMapper = customerMapper;
     }
 
-    @PostMapping("/")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CustomerResponse createCustomer(@RequestBody CustomerRequest customerRequest) throws DomainException {
         Customer customer = createCustomerUseCase.create(UUID.randomUUID().getMostSignificantBits(), customerRequest);
