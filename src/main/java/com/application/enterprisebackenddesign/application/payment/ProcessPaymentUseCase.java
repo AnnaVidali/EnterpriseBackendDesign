@@ -8,8 +8,13 @@ import com.application.enterprisebackenddesign.domain.payment.Payment;
 import com.application.enterprisebackenddesign.domain.payment.PaymentRepository;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import com.application.enterprisebackenddesign.domain.shared.Money;
+import com.application.enterprisebackenddesign.infrastructure.external.GatewayPaymentRequest;
+import com.application.enterprisebackenddesign.infrastructure.external.PaymentGateway;
+import com.application.enterprisebackenddesign.infrastructure.external.PaymentResult;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -18,11 +23,13 @@ public class ProcessPaymentUseCase {
     private final PaymentRepository paymentRepository;
     private final InvoiceRepository invoiceRepository;
     private final DomainEventPublisher eventPublisher;
+    private final PaymentGateway paymentGateway;
 
-    public ProcessPaymentUseCase(PaymentRepository paymentRepository, InvoiceRepository invoiceRepository, DomainEventPublisher eventPublisher) {
+    public ProcessPaymentUseCase(PaymentRepository paymentRepository, InvoiceRepository invoiceRepository, DomainEventPublisher eventPublisher, PaymentGateway paymentGateway) {
         this.paymentRepository = paymentRepository;
         this.invoiceRepository = invoiceRepository;
         this.eventPublisher = eventPublisher;
+        this.paymentGateway = paymentGateway;
     }
 
     public Payment execute(Long invoiceID, Money paymentAmount) throws DomainException {
@@ -35,8 +42,14 @@ public class ProcessPaymentUseCase {
         if (!payment.matchesInvoice(invoice.getAmount())) {
             throw new DomainException.BusinessRuleViolationException("Payment amount does not match invoice amount.");
         }
-        payment.complete();
-        invoice.markAsPaid();
+
+        PaymentResult result = paymentGateway.process(new GatewayPaymentRequest(invoiceID, paymentAmount));
+        if (result.success()) {
+            payment.complete();
+            invoice.markAsPaid();
+        } else {
+            payment.fail(result.message());
+        }
 
         paymentRepository.save(payment);
         invoiceRepository.save(invoice);
@@ -48,6 +61,6 @@ public class ProcessPaymentUseCase {
     }
 
     private Long generatePaymentId() {
-        return System.currentTimeMillis();
+        return UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
     }
 }
