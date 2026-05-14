@@ -1,5 +1,6 @@
 package com.application.enterprisebackenddesign.infrastructure.persistence.payment;
 
+import com.application.enterprisebackenddesign.domain.payment.PaymentStatus;
 import com.application.enterprisebackenddesign.infrastructure.persistence.payment.entity.PaymentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,7 +12,7 @@ public interface SpringDataPaymentRepository extends JpaRepository<PaymentEntity
 
     List<PaymentEntity> findByCustomerId(Long customerId);
 
-    List<PaymentEntity> findByOrderId(Long orderId);
+    List<PaymentEntity> findByStatus(PaymentStatus status);
 
-    List<PaymentEntity> findByStatus(String status);
+    List<PaymentEntity> findByInvoiceIdAndCustomerIdAndStatus(Long invoiceId, Long customerId, PaymentStatus status);
 }
