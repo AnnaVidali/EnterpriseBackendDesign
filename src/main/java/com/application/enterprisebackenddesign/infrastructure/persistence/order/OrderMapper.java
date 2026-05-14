@@ -21,7 +21,7 @@ public class OrderMapper {
         OrderEntity entity = new OrderEntity();
         entity.setId(order.getId());
         entity.setCustomerId(order.getCustomerId());
-        entity.setStatus(order.getStatus().name());
+        entity.setStatus(order.getStatus());
         entity.setCurrency(order.getCurrency().getCurrencyCode());
         entity.setTotalAmount(order.getTotalAmount().getAmount());
 

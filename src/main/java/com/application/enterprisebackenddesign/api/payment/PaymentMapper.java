@@ -1,6 +1,7 @@
 package com.application.enterprisebackenddesign.api.payment;
 
 import com.application.enterprisebackenddesign.domain.payment.Payment;
+import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import com.application.enterprisebackenddesign.domain.shared.Money;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,7 @@ public class PaymentMapper {
         );
     }
 
-    public Money toMoney(PaymentRequest request) {
+    public Money toMoney(PaymentRequest request) throws DomainException {
         return new Money(request.amount(), Currency.getInstance(request.currency()));
     }
 }

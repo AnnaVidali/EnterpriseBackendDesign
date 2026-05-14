@@ -5,8 +5,6 @@ import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import com.application.enterprisebackenddesign.infrastructure.persistence.customer.entity.CustomerEntity;
 import org.springframework.stereotype.Component;
 
-import java.util.Currency;
-
 @Component
 public class CustomerMapper {
 

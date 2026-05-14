@@ -15,7 +15,8 @@ public interface InvoiceRepository {
 
     List<Invoice> findByStatus(InvoiceStatus status);
 
-    void deleteById(Long id);
+    List<Invoice> findByCustomerIdAndStatus(Long customerId, InvoiceStatus status);
 
-    boolean existsById(Long id);
+    List<Invoice> findAll();
+
 }

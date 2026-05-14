@@ -159,14 +159,6 @@ public class Order {
         }
     }
 
-    public int getNumberOfOrderLines() {
-        return orderLines.size();
-    }
-
-    public boolean hasLine(OrderLine orderLine) {
-        return orderLines.contains(orderLine);
-    }
-
     public boolean isEmpty() {
         return orderLines.isEmpty();
     }

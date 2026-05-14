@@ -64,22 +64,8 @@ public class Invoice {
         events.add(new com.application.enterprisebackenddesign.domain.shared.OrderBilledEvent(orderId, customerId, amount));
     }
 
-    public void cancel() throws DomainException.BusinessRuleViolationException {
-        if(status == InvoiceStatus.PAID){
-            throw new DomainException.BusinessRuleViolationException("Cannot cancel a PAID invoice.");
-        }
-        if (status == InvoiceStatus.CANCELLED) {
-            return;
-        }
-        status = InvoiceStatus.CANCELLED;
-    }
-
     public static Invoice fromOrder(Long id, Long orderId, Long customerId, Money amount) throws DomainException {
         return new Invoice(id, customerId, orderId, amount, InvoiceStatus.DRAFT, null);
-    }
-
-    public List<DomainEvent> getEvents() {
-        return List.copyOf(events);
     }
 
     public void clearEvents() {

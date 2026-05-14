@@ -9,5 +9,13 @@ public interface PaymentRepository {
 
     Optional<Payment> findById(Long id);
 
+    List<Payment> findAll();
+
     List<Payment> findByInvoiceId(Long invoiceId);
+
+    List<Payment> findByCustomerId(Long customerId);
+
+    List<Payment> findByStatus(PaymentStatus status);
+
+    List<Payment> findByInvoiceIdAndCustomerIdAndStatus(Long invoiceId, Long customerId, PaymentStatus status);
 }

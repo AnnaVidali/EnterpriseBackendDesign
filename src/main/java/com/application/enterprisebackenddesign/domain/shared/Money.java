@@ -46,17 +46,6 @@ public class Money implements Comparable<Money> {
         return new Money(amount.add(subtotal.amount), currency);
     }
 
-    public Money subtract(Money subtotal) throws DomainException.BusinessRuleViolationException {
-        if (subtotal == null) {
-            throw new DomainException.BusinessRuleViolationException("Cannot subtract null value.");
-        }
-        assertSameCurrency(subtotal);
-        if (amount.subtract(subtotal.amount).compareTo(BigDecimal.ZERO) < 0){
-            throw new DomainException.BusinessRuleViolationException("Result after subtraction cannot be negative.");
-        }
-        return new Money(amount.subtract(subtotal.amount), currency);
-    }
-
     public boolean isZero(){
         return amount.compareTo(BigDecimal.ZERO) == 0;
     }
@@ -73,10 +62,6 @@ public class Money implements Comparable<Money> {
             throw new IllegalArgumentException("Currencies do not match.");
         }
         return amount.compareTo(other.amount);
-    }
-
-    public static Money of(double amount, String currencyCode) throws DomainException.BusinessRuleViolationException {
-        return new Money(BigDecimal.valueOf(amount), Currency.getInstance(currencyCode));
     }
 
     @Override

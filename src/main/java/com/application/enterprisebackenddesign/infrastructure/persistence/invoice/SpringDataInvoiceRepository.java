@@ -1,5 +1,6 @@
 package com.application.enterprisebackenddesign.infrastructure.persistence.invoice;
 
+import com.application.enterprisebackenddesign.domain.invoice.InvoiceStatus;
 import com.application.enterprisebackenddesign.infrastructure.persistence.invoice.entity.InvoiceEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,5 +12,7 @@ public interface SpringDataInvoiceRepository extends JpaRepository<InvoiceEntity
 
     List<InvoiceEntity> findByCustomerId(Long customerId);
 
-    List<InvoiceEntity> findByStatus(String status);
+    List<InvoiceEntity> findByStatus(InvoiceStatus status);
+
+    List<InvoiceEntity> findByCustomerIdAndStatus(Long customerId, InvoiceStatus status);
 }

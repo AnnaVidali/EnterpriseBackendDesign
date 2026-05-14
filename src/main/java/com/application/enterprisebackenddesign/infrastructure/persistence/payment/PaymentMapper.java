@@ -1,7 +1,5 @@
 package com.application.enterprisebackenddesign.infrastructure.persistence.payment;
 
-import com.application.enterprisebackenddesign.domain.invoice.Invoice;
-import com.application.enterprisebackenddesign.domain.invoice.InvoiceStatus;
 import com.application.enterprisebackenddesign.domain.payment.Payment;
 import com.application.enterprisebackenddesign.domain.payment.PaymentStatus;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;

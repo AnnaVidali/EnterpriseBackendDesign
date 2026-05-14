@@ -1,5 +1,6 @@
 package com.application.enterprisebackenddesign.infrastructure.persistence.order.entity;
 
+import com.application.enterprisebackenddesign.domain.order.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +22,8 @@ public class OrderEntity {
     private Long customerId;
 
     @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     @Column(nullable = false)
     private String currency;

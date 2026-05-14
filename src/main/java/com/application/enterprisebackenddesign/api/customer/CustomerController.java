@@ -2,12 +2,10 @@ package com.application.enterprisebackenddesign.api.customer;
 
 import com.application.enterprisebackenddesign.application.customer.*;
 import com.application.enterprisebackenddesign.domain.customer.Customer;
-import com.application.enterprisebackenddesign.domain.customer.CustomerRepository;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +29,7 @@ public class CustomerController {
         this.customerMapper = customerMapper;
     }
 
-    @PostMapping("/")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CustomerResponse createCustomer(@RequestBody CustomerRequest customerRequest) throws DomainException {
         Customer customer = createCustomerUseCase.create(UUID.randomUUID().getMostSignificantBits(), customerRequest);
@@ -44,8 +42,8 @@ public class CustomerController {
         return customerMapper.toResponse(customer);
     }
 
-    @GetMapping("/all")
-    public List<CustomerResponse> getAllCustomers() throws DomainException {
+    @GetMapping
+    public List<CustomerResponse> getAllCustomers() {
         List<Customer> customers = listCustomersUseCase.listAll();
         return customers.stream()
                 .map(customerMapper::toResponse)
