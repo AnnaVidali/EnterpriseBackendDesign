@@ -40,7 +40,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public List<Order> findByStatus(OrderStatus status) {
-        return repository.findByStatus(status.name())
+        return repository.findByStatus(status)
                 .stream()
                 .map(orderMapper::toDomain)
                 .toList();
@@ -69,7 +69,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public List<Order> findByCustomerIdAndStatus(Long customerId, OrderStatus status) {
-        return repository.findByCustomerIdAndStatus(customerId, status.name())
+        return repository.findByCustomerIdAndStatus(customerId, status)
                 .stream()
                 .map(orderMapper::toDomain)
                 .toList();

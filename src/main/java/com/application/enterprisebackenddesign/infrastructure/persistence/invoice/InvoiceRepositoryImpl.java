@@ -44,7 +44,22 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
 
     @Override
     public List<Invoice> findByStatus(InvoiceStatus status) {
-        return repository.findByStatus(status.name()).stream().map(invoiceMapper::toDomain).toList();
+        return repository.findByStatus(status).stream().map(invoiceMapper::toDomain).toList();
+    }
+
+    @Override
+    public List<Invoice> findByCustomerIdAndStatus(Long customerId, InvoiceStatus status) {
+        return repository.findByCustomerIdAndStatus(customerId, status)
+                .stream()
+                .map(invoiceMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Invoice> findAll() {
+        return repository.findAll().stream()
+                .map(invoiceMapper::toDomain)
+                .toList();
     }
 
     @Override
