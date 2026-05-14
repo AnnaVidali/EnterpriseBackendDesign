@@ -2,7 +2,6 @@ package com.application.enterprisebackenddesign.api.product;
 
 import com.application.enterprisebackenddesign.application.product.*;
 import com.application.enterprisebackenddesign.domain.product.Product;
-import com.application.enterprisebackenddesign.domain.product.ProductRepository;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -20,17 +19,14 @@ public class ProductController {
     private final GetProductUseCase getProductUseCase;
     private final ListProductsUseCase listProductsUseCase;
     private final UpdateProductUseCase updateProductUseCase;
-    private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
-
-    public ProductController(CreateProductUseCase createProductUseCase, DeleteProductUseCase deleteProductUseCase, GetProductUseCase getProductUseCase, ListProductsUseCase listProductsUseCase, UpdateProductUseCase updateProductUseCase, ProductRepository productRepository, ProductMapper productMapper) {
+    public ProductController(CreateProductUseCase createProductUseCase, DeleteProductUseCase deleteProductUseCase, GetProductUseCase getProductUseCase, ListProductsUseCase listProductsUseCase, UpdateProductUseCase updateProductUseCase, ProductMapper productMapper) {
         this.createProductUseCase = createProductUseCase;
         this.deleteProductUseCase = deleteProductUseCase;
         this.getProductUseCase = getProductUseCase;
         this.listProductsUseCase = listProductsUseCase;
         this.updateProductUseCase = updateProductUseCase;
-        this.productRepository = productRepository;
         this.productMapper = productMapper;
     }
 
@@ -48,7 +44,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<ProductResponse> getAllProducts() throws DomainException {
+    public List<ProductResponse> getAllProducts() {
         List<Product> products = listProductsUseCase.listAll();
         return products.stream()
                 .map(productMapper::toResponse)

@@ -17,6 +17,6 @@ public class GetProductUseCase {
     }
 
     public Product getProductById(Long id) throws DomainException {
-        return productRepository.findById(id).orElseThrow(() -> new DomainException("Product not found"));
+        return productRepository.findById(id).orElseThrow(() -> new DomainException("Product not found."));
     }
 }
