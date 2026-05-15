@@ -90,7 +90,7 @@ PostgreSQL with Flyway migrations. Tables and migrations:
 | V4 | Create payments |
 | V5 | Add audit fields (version, created_date, last_modified_date) |
 | V6 | Seed sample data |
-| V7 | Rollback script (reverse V1-V6) |
+| V7 | Removed (see docs/rollback-notes.md for manual rollback steps) |
 
 ### Seed Data
 
@@ -103,18 +103,14 @@ Migration V6 inserts sample data for development:
 
 ### Rollback Procedure
 
-Since Flyway Community Edition does not support `undo` migrations, manual rollback is done via the V7 migration:
+Flyway Community Edition does not support `undo` migrations. Manual rollback steps are documented in:
 
-1. Apply V7 to reverse all migrations: Flyway will execute `V7__rollback.sql`
-2. Remove V7 from the migrations directory after applying
-3. Use `flyway repair` if the schema history table is out of sync
-
-```bash
-# Apply rollback
-./mvnw flyway:migrate -Dflyway.locations=classpath:db/migration
+```
+docs/rollback-notes.md
 ```
 
-**Note**: V7 drops all tables. Export any needed data before rolling back.
+Run each rollback SQL manually in reverse version order (V6 first, then V5, ..., V1 last).
+After applying, use `flyway repair` if the schema history table is out of sync.
 
 ## Authentication
 

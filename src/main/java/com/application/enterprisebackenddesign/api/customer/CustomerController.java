@@ -2,6 +2,7 @@ package com.application.enterprisebackenddesign.api.customer;
 
 import com.application.enterprisebackenddesign.api.shared.PageResponse;
 import com.application.enterprisebackenddesign.application.customer.*;
+import com.application.enterprisebackenddesign.application.shared.IdGenerator;
 import com.application.enterprisebackenddesign.domain.customer.Customer;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,8 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 /**
  * REST controller for customer operations.
@@ -50,14 +49,16 @@ public class CustomerController {
     private final ListCustomersUseCase listCustomersUseCase;
     private final UpdateCustomerUseCase updateCustomerUseCase;
     private final CustomerMapper customerMapper;
+    private final IdGenerator idGenerator;
 
-    public CustomerController(CreateCustomerUseCase createCustomerUseCase, DeleteCustomerUseCase deleteCustomerUseCase, GetCustomerUseCase getCustomerUseCase, ListCustomersUseCase listCustomersUseCase, UpdateCustomerUseCase updateCustomerUseCase, CustomerMapper customerMapper) {
+    public CustomerController(CreateCustomerUseCase createCustomerUseCase, DeleteCustomerUseCase deleteCustomerUseCase, GetCustomerUseCase getCustomerUseCase, ListCustomersUseCase listCustomersUseCase, UpdateCustomerUseCase updateCustomerUseCase, CustomerMapper customerMapper, IdGenerator idGenerator) {
         this.createCustomerUseCase = createCustomerUseCase;
         this.deleteCustomerUseCase = deleteCustomerUseCase;
         this.getCustomerUseCase = getCustomerUseCase;
         this.listCustomersUseCase = listCustomersUseCase;
         this.updateCustomerUseCase = updateCustomerUseCase;
         this.customerMapper = customerMapper;
+        this.idGenerator = idGenerator;
     }
 
     @PostMapping
@@ -70,7 +71,7 @@ public class CustomerController {
             @ApiResponse(responseCode = "400", description = "Invalid request body")
     })
     public CustomerResponse createCustomer(@RequestBody @Valid CustomerRequest customerRequest) throws DomainException {
-        Customer customer = createCustomerUseCase.create(UUID.randomUUID().getMostSignificantBits(), customerRequest);
+        Customer customer = createCustomerUseCase.create(idGenerator.generateId(), customerRequest);
         return customerMapper.toResponse(customer);
     }
 

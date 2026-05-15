@@ -2,6 +2,7 @@ package com.application.enterprisebackenddesign.api.product;
 
 import com.application.enterprisebackenddesign.api.shared.PageResponse;
 import com.application.enterprisebackenddesign.application.product.*;
+import com.application.enterprisebackenddesign.application.shared.IdGenerator;
 import com.application.enterprisebackenddesign.domain.product.Product;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,8 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 /**
  * REST controller for the Product aggregate.
@@ -44,14 +43,16 @@ public class ProductController {
     private final ListProductsUseCase listProductsUseCase;
     private final UpdateProductUseCase updateProductUseCase;
     private final ProductMapper productMapper;
+    private final IdGenerator idGenerator;
 
-    public ProductController(CreateProductUseCase createProductUseCase, DeleteProductUseCase deleteProductUseCase, GetProductUseCase getProductUseCase, ListProductsUseCase listProductsUseCase, UpdateProductUseCase updateProductUseCase, ProductMapper productMapper) {
+    public ProductController(CreateProductUseCase createProductUseCase, DeleteProductUseCase deleteProductUseCase, GetProductUseCase getProductUseCase, ListProductsUseCase listProductsUseCase, UpdateProductUseCase updateProductUseCase, ProductMapper productMapper, IdGenerator idGenerator) {
         this.createProductUseCase = createProductUseCase;
         this.deleteProductUseCase = deleteProductUseCase;
         this.getProductUseCase = getProductUseCase;
         this.listProductsUseCase = listProductsUseCase;
         this.updateProductUseCase = updateProductUseCase;
         this.productMapper = productMapper;
+        this.idGenerator = idGenerator;
     }
 
     @PostMapping
@@ -64,7 +65,7 @@ public class ProductController {
             @ApiResponse(responseCode = "400", description = "Invalid request body or duplicate SKU")
     })
     public ProductResponse createProduct(@RequestBody @Valid ProductRequest productRequest) throws DomainException {
-        Product product = createProductUseCase.create(UUID.randomUUID().getMostSignificantBits(), productRequest);
+        Product product = createProductUseCase.create(idGenerator.generateId(), productRequest);
         return productMapper.toResponse(product);
     }
 

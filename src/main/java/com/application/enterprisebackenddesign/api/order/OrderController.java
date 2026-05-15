@@ -2,6 +2,7 @@ package com.application.enterprisebackenddesign.api.order;
 
 import com.application.enterprisebackenddesign.api.shared.PageResponse;
 import com.application.enterprisebackenddesign.application.order.*;
+import com.application.enterprisebackenddesign.application.shared.IdGenerator;
 import com.application.enterprisebackenddesign.domain.order.Order;
 import com.application.enterprisebackenddesign.domain.order.OrderStatus;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
@@ -19,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Currency;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -52,6 +52,7 @@ public class OrderController {
     private final GetOrderUseCase getOrderUseCase;
     private final ListOrdersUseCase listOrdersUseCase;
     private final OrderMapper orderMapper;
+    private final IdGenerator idGenerator;
 
     public OrderController(CreateOrderUseCase createOrderUseCase,
                            ConfirmOrderUseCase confirmOrderUseCase,
@@ -59,7 +60,7 @@ public class OrderController {
                            AddOrderLineUseCase addOrderLineUseCase,
                            UpdateOrderLineUseCase updateOrderLineUseCase,
                            RemoveOrderLineUseCase removeOrderLineUseCase, GetOrderUseCase getOrderUseCase, ListOrdersUseCase listOrdersUseCase,
-                           OrderMapper orderMapper) {
+                           OrderMapper orderMapper, IdGenerator idGenerator) {
         this.createOrderUseCase = createOrderUseCase;
         this.confirmOrderUseCase = confirmOrderUseCase;
         this.cancelOrderUseCase = cancelOrderUseCase;
@@ -69,6 +70,7 @@ public class OrderController {
         this.getOrderUseCase = getOrderUseCase;
         this.listOrdersUseCase = listOrdersUseCase;
         this.orderMapper = orderMapper;
+        this.idGenerator = idGenerator;
     }
 
     @PostMapping
@@ -84,10 +86,10 @@ public class OrderController {
         Currency currency = Currency.getInstance(request.currency());
 
         var lines = request.lines().stream()
-                .map(lr -> orderMapper.toOrderLine(UUID.randomUUID().getMostSignificantBits(), lr, currency))
+                .map(lr -> orderMapper.toOrderLine(idGenerator.generateId(), lr, currency))
                 .collect(Collectors.toList());
 
-        Order order = createOrderUseCase.execute(UUID.randomUUID().getMostSignificantBits(), request.customerId(), lines, currency);
+        Order order = createOrderUseCase.execute(idGenerator.generateId(), request.customerId(), lines, currency);
         return orderMapper.toResponse(order);
     }
 
@@ -131,7 +133,7 @@ public class OrderController {
     public OrderResponse addLine(@PathVariable Long id, @RequestBody OrderLineRequest request) throws DomainException {
         Currency currency = Currency.getInstance(request.currency());
         Money price = new Money(request.price(), currency);
-        Order order = addOrderLineUseCase.execute(id, UUID.randomUUID().getMostSignificantBits(), request.productId(), price, request.quantity());
+        Order order = addOrderLineUseCase.execute(id, idGenerator.generateId(), request.productId(), price, request.quantity());
         return orderMapper.toResponse(order);
     }
 
