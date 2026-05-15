@@ -10,6 +10,23 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+/**
+ * JPA entity for the products table.
+ *
+ * Interview context: ProductEntity demonstrates the @Embedded mapping.
+ * The "price" field is an @Embedded MoneyEmbeddable, which maps to two
+ * columns in the products table: price_amount (DECIMAL) and price_currency
+ * (VARCHAR). This avoids a separate "prices" table for a simple attribute.
+ *
+ * Like all entities, ProductEntity has:
+ * - @Version for optimistic locking (prevents concurrent overwrites)
+ * - @CreatedDate / @LastModifiedDate for audit trail
+ * - Explicit @Id (no @GeneratedValue) — IDs come from IdGenerator
+ *
+ * The product's SKU has a unique constraint in the database (V1 migration),
+ * enforced at the DB level in addition to domain-level validation in
+ * the Product domain constructor.
+ */
 @Getter
 @Setter
 @Entity
@@ -37,5 +54,5 @@ public class ProductEntity {
     private LocalDateTime lastModifiedDate;
 
     @Version
-    private Long version;
+    private Long version = 0L;
 }

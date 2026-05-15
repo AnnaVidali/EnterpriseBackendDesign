@@ -5,6 +5,27 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * JPA entity for the order_lines table.
+ *
+ * Interview context: OrderLineEntity is the child side of the
+ * Order → OrderLine bidirectional @OneToMany mapping. It owns the
+ * foreign key (order_id column) because in JPA, the @ManyToOne
+ * side is always the "owner" of the relationship.
+ *
+ * Note that OrderLineEntity does NOT have @Version, @CreatedDate, or
+ * @LastModifiedDate. This is intentional — optimistic locking is on the
+ * AGGREGATE ROOT (OrderEntity), not on individual lines. If two users
+ * modify different lines simultaneously, the Order's version check will
+ * fail on the second save, preventing concurrent modification.
+ *
+ * The "order" field creates the bidirectional link needed for JPA
+ * cascading. When OrderEntity is saved with CascadeType.ALL, Hibernate
+ * traverses this link to persist/update/delete child lines.
+ *
+ * MoneyEmbeddable is reused here (same as ProductEntity.price),
+ * demonstrating the value of @Embeddable for shared value objects.
+ */
 @Setter
 @Getter
 @Entity

@@ -7,7 +7,7 @@ import com.application.enterprisebackenddesign.infrastructure.persistence.produc
 import com.application.enterprisebackenddesign.infrastructure.persistence.shared.MoneyEmbeddable;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("infraProductMapper")
 public class ProductMapper {
 
     public ProductEntity toEntity(Product product) throws DomainException {

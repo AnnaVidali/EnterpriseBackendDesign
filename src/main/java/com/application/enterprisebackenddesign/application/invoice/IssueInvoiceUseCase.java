@@ -13,6 +13,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Use case for issuing an invoice against a confirmed order.
+ * Creates or retrieves a DRAFT invoice, transitions it to ISSUED,
+ * persists the change, and publishes domain events.
+ */
 @Service
 @Transactional
 public class IssueInvoiceUseCase {
@@ -34,21 +39,16 @@ public class IssueInvoiceUseCase {
             throw new DomainException.BusinessRuleViolationException("Order status is not CONFIRMED");
         }
 
-        List<Invoice> invoice = invoiceRepository.findByOrderId(orderId);
-
-        Invoice invoiceToSave = null;
-
-        for(Invoice invoiceItem : invoice){
-            if(invoiceItem.getStatus() == InvoiceStatus.DRAFT) {
-                invoiceToSave = invoiceItem;
-                break;
-            }
-        }
-
-        if(invoiceToSave == null) {
-            // Using orderId as invoiceId since we enforce one invoice per order
-            invoiceToSave = Invoice.fromOrder(orderId, orderId, order.getCustomerId(), order.getTotalAmount());
-        }
+        Invoice invoiceToSave = invoiceRepository.findByOrderId(orderId).stream()
+                .filter(i -> i.getStatus() == InvoiceStatus.DRAFT)
+                .findFirst()
+                .orElseGet(() -> {
+                    try {
+                        return Invoice.fromOrder(orderId, orderId, order.getCustomerId(), order.getTotalAmount());
+                    } catch (DomainException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
 
         invoiceToSave.issue();
 

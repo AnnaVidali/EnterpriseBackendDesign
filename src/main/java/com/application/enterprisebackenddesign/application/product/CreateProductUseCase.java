@@ -11,6 +11,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Currency;
 
+/**
+ * Use case for creating a new product. Validates SKU uniqueness,
+ * constructs the product aggregate, persists it, and publishes
+ * domain events.
+ */
 @Service
 @Transactional
 public class CreateProductUseCase {
@@ -25,7 +30,7 @@ public class CreateProductUseCase {
 
     public Product create(Long id, ProductRequest request) throws DomainException {
         if (productRepository.findBySku(request.sku()).isPresent()) {
-            throw new DomainException("SKU is not unique.");
+            throw new DomainException.BusinessRuleViolationException("SKU is not unique.");
         }
 
         Currency currency = Currency.getInstance(request.currency());

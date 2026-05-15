@@ -8,6 +8,29 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Aggregate root representing an invoice for a confirmed order.
+ * Manages lifecycle from DRAFT through ISSUED to PAID and raises
+ * domain events for creation, issuance, and payment completion.
+ *
+ * Interview context: Invoice bridges the Order and Payment aggregates.
+ * The flow is: Order CONFIRMED → Invoice created (DRAFT) → Invoice ISSUED
+ * → Payment processed → Invoice PAID. Each transition happens in a
+ * separate use case, preserving the single-responsibility principle.
+ *
+ * Key design choices:
+ * 1. fromOrder() factory method — creates a DRAFT invoice without the
+ *    caller knowing the initial status. Encapsulates creation logic.
+ * 2. markAsPaid() fires OrderBilledEvent (not InvoicePaidEvent) because
+ *    the important side effect is billing the order, not just updating
+ *    the invoice. The event name reflects the business meaning, not the
+ *    technical operation.
+ * 3. Invoice stores customerId + orderId as IDs only — no JPA @ManyToOne
+ *    relationships to CustomerEntity or OrderEntity. This avoids lazy
+ *    loading issues and keeps aggregate boundaries clean. The references
+ *    are "weak" (just IDs), which is a valid DDD approach when aggregates
+ *    need to reference each other.
+ */
 @Getter
 public class Invoice {
 

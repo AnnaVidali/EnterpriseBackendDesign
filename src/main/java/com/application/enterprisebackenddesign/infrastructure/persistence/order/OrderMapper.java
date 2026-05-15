@@ -14,7 +14,24 @@ import java.util.Currency;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
+/**
+ * Persistence-layer mapper between Order domain objects and OrderEntity JPA entities.
+ *
+ * This mapper implements the bidirectional transformation that makes the
+ * persistence-ignorant domain model work with JPA. It is the bridge between
+ * the domain's rich object graph and the relational entity model.
+ *
+ * The most critical detail is in toLineEntity(): the call to
+ * entity.setOrder(parent) on line 62. For a bidirectional @OneToMany mapping,
+ * JPA requires both sides of the relationship to be set. Without this,
+ * the foreign key column (order_id) would be null when saving.
+ *
+ * Tradeoff: The mapper catches DomainException.BusinessRuleViolationException
+ * from domain constructors and wraps it in RuntimeException. This is because
+ * domain validation should have already happened before reaching persistence —
+ * if it fails here, it indicates a bug upstream, not a recoverable condition.
+ */
+@Component("infraOrderMapper")
 public class OrderMapper {
 
     public OrderEntity toEntity(Order order) {
@@ -45,7 +62,8 @@ public class OrderMapper {
                     entity.getId(),
                     entity.getCustomerId(),
                     orderLines,
-                    Currency.getInstance(entity.getCurrency())
+                    Currency.getInstance(entity.getCurrency()),
+                    entity.getStatus()
             );
         } catch (DomainException.BusinessRuleViolationException e) {
             throw new RuntimeException("Failed to create Order from entity", e);

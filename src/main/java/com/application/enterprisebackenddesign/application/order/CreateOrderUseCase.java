@@ -11,6 +11,11 @@ import org.springframework.stereotype.Service;
 import java.util.Currency;
 import java.util.List;
 
+/**
+ * Use case for creating a new order. Builds the order aggregate
+ * from the provided parameters, persists it, and publishes
+ * domain events.
+ */
 @Service
 @Transactional
 public class CreateOrderUseCase {

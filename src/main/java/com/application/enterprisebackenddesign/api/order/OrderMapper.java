@@ -9,6 +9,20 @@ import org.springframework.stereotype.Component;
 import java.util.Currency;
 import java.util.stream.Collectors;
 
+/**
+ * API-layer mapper for the Order aggregate.
+ *
+ * Boundary translation (Hexagonal Architecture): This mapper converts between
+ * API DTOs (OrderLineRequest/OrderLineResponse) and domain objects (OrderLine).
+ * It sits at the outermost adapter layer and handles:
+ * - Dismantling Money construction from separate amount + currency fields
+ * - Wrapping domain BusinessRuleViolationExceptions into runtime
+ *   IllegalArgumentExceptions (HTTP boundary translation)
+ *
+ * The separation between this API mapper and the infrastructure/persistence/order/OrderMapper
+ * is intentional: one handles HTTP concerns, the other handles persistence concerns.
+ * They are in different hexagon layers and should not be confused.
+ */
 @Component
 public class OrderMapper {
 

@@ -6,6 +6,24 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Aggregate root representing a product in the catalog.
+ * Encapsulates product identity, pricing, SKU, and domain events
+ * raised on creation or updates to price, name, or SKU.
+ *
+ * Interview context: Product is a standalone aggregate (no child entities).
+ * It's referenced by OrderLine via productId, but there's no JPA
+ * @ManyToOne relationship — products and orders are separate aggregates
+ * that communicate through IDs and domain events.
+ *
+ * SKU validation enforces business rules (no special characters like @ < > &,
+ * no leading zeros) and auto-uppercases for consistency. The price is
+ * a Money value object, preventing currency mismatch bugs.
+ *
+ * Events raised:
+ * - ProductCreatedEvent → triggers inventory setup + warehouse notification
+ * - ProductUpdatedEvent → triggers price sync to external systems
+ */
 @Getter
 public class Product {
 
@@ -15,6 +33,13 @@ public class Product {
     private String sku;
     private final List<DomainEvent> events = new ArrayList<>();
 
+    /**
+     * @param id    unique identifier, must not be null
+     * @param name  product name, must not be null or empty
+     * @param price product price, must not be null or zero
+     * @param sku   stock keeping unit, must not be null, empty, or contain invalid characters
+     * @throws DomainException.BusinessRuleViolationException if any validation fails
+     */
     public Product(Long id, String name, Money price, String sku) throws DomainException.BusinessRuleViolationException {
         if(id == null){
             throw new DomainException.BusinessRuleViolationException("Id cannot be null.");
