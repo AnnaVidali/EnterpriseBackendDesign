@@ -6,6 +6,14 @@ import com.application.enterprisebackenddesign.domain.payment.Payment;
 import com.application.enterprisebackenddesign.domain.payment.PaymentRepository;
 import com.application.enterprisebackenddesign.domain.payment.PaymentStatus;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +24,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/payments")
+@Tag(name = "Payments", description = "Payment processing — process payments for invoices and retrieve payment history")
 public class PaymentController {
 
     private final ProcessPaymentUseCase processPaymentUseCase;
@@ -33,12 +42,28 @@ public class PaymentController {
     }
 
     @PostMapping
+    @Operation(summary = "Process a payment",
+            description = "Processes a payment for an invoice. Validates the invoice status, matches the amount, " +
+                    "calls the configured payment gateway, and records the result.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Payment processed",
+                    content = @Content(schema = @Schema(implementation = PaymentResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request, invoice not ISSUED, or amount mismatch"),
+            @ApiResponse(responseCode = "404", description = "Invoice not found")
+    })
     public ResponseEntity<PaymentResponse> processPayment(@Valid @RequestBody PaymentRequest request) throws DomainException {
         Payment payment = processPaymentUseCase.execute(request.invoiceId(), paymentMapper.toMoney(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentMapper.toResponse(payment));
     }
 
     @GetMapping("/{paymentId}")
+    @Operation(summary = "Get a payment by ID",
+            description = "Returns payment details including status, amount, and gateway transaction ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Payment found",
+                    content = @Content(schema = @Schema(implementation = PaymentResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Payment not found")
+    })
     public PaymentResponse getPayment(@PathVariable Long paymentId) throws DomainException.ResourceNotFoundException {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new DomainException.ResourceNotFoundException("Payment not found with id: " + paymentId));
@@ -46,7 +71,14 @@ public class PaymentController {
     }
 
     @GetMapping
-    public List<PaymentResponse> getPayments(@RequestParam(required = false) Long invoiceId, @RequestParam(required = false) Long customerId, @RequestParam(required = false) PaymentStatus status) {
+    @Operation(summary = "List payments",
+            description = "Returns payments optionally filtered by invoice ID, customer ID, and/or status.")
+    @ApiResponse(responseCode = "200", description = "List of payments",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PaymentResponse.class))))
+    public List<PaymentResponse> getPayments(
+            @Parameter(description = "Filter by invoice ID") @RequestParam(required = false) Long invoiceId,
+            @Parameter(description = "Filter by customer ID") @RequestParam(required = false) Long customerId,
+            @Parameter(description = "Filter by payment status") @RequestParam(required = false) PaymentStatus status) {
         List<Payment> payments;
         if (invoiceId != null && customerId != null && status != null) {
             payments = listPaymentsUseCase.listByInvoiceIdAndCustomerIdAndStatus(invoiceId, customerId, status);

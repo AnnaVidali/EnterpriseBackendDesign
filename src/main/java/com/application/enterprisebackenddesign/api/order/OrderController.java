@@ -5,6 +5,14 @@ import com.application.enterprisebackenddesign.domain.order.Order;
 import com.application.enterprisebackenddesign.domain.order.OrderStatus;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import com.application.enterprisebackenddesign.domain.shared.Money;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +23,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/orders")
+@Tag(name = "Orders", description = "Order lifecycle management — create, confirm, cancel, and manage order lines")
 public class OrderController {
 
     private final CreateOrderUseCase createOrderUseCase;
@@ -47,6 +56,13 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create a new order",
+            description = "Creates an order with multiple order lines. Each line specifies a product, quantity, and price.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Order created",
+                    content = @Content(schema = @Schema(implementation = OrderResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request body")
+    })
     public OrderResponse createOrder(@RequestBody CreateOrderRequest request) throws DomainException {
         Currency currency = Currency.getInstance(request.currency());
 
@@ -59,18 +75,42 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/confirm")
+    @Operation(summary = "Confirm an order",
+            description = "Transitions the order from PENDING to CONFIRMED status. Triggers invoice creation.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order confirmed",
+                    content = @Content(schema = @Schema(implementation = OrderResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Order not found"),
+            @ApiResponse(responseCode = "400", description = "Order is not in PENDING status")
+    })
     public OrderResponse confirmOrder(@PathVariable Long id) throws DomainException {
         Order order = confirmOrderUseCase.execute(id);
         return orderMapper.toResponse(order);
     }
 
     @PostMapping("/{id}/cancel")
+    @Operation(summary = "Cancel an order",
+            description = "Transitions the order from PENDING or CONFIRMED to CANCELLED status.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order cancelled",
+                    content = @Content(schema = @Schema(implementation = OrderResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Order not found"),
+            @ApiResponse(responseCode = "400", description = "Order cannot be cancelled in its current status")
+    })
     public OrderResponse cancelOrder(@PathVariable Long id) throws DomainException {
         Order order = cancelOrderUseCase.execute(id);
         return orderMapper.toResponse(order);
     }
 
     @PostMapping("/{id}/lines")
+    @Operation(summary = "Add a line to an order",
+            description = "Adds a new product line to an existing PENDING order.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Line added",
+                    content = @Content(schema = @Schema(implementation = OrderResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Order not found"),
+            @ApiResponse(responseCode = "400", description = "Order is not in PENDING status")
+    })
     public OrderResponse addLine(@PathVariable Long id, @RequestBody OrderLineRequest request) throws DomainException {
         Currency currency = Currency.getInstance(request.currency());
         Money price = new Money(request.price(), currency);
@@ -79,25 +119,54 @@ public class OrderController {
     }
 
     @PutMapping("/{id}/lines/{lineId}")
+    @Operation(summary = "Update an order line",
+            description = "Changes the quantity of an existing order line.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Line updated",
+                    content = @Content(schema = @Schema(implementation = OrderResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Order or line not found"),
+            @ApiResponse(responseCode = "400", description = "Order is not in PENDING status")
+    })
     public OrderResponse updateLine(@PathVariable Long id, @PathVariable Long lineId, @RequestBody OrderLineRequest request) throws DomainException {
         Order order = updateOrderLineUseCase.execute(id, lineId, request.quantity());
         return orderMapper.toResponse(order);
     }
 
     @DeleteMapping("/{id}/lines/{lineId}")
+    @Operation(summary = "Remove an order line",
+            description = "Removes a product line from an existing PENDING order.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Line removed",
+                    content = @Content(schema = @Schema(implementation = OrderResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Order or line not found"),
+            @ApiResponse(responseCode = "400", description = "Order is not in PENDING status")
+    })
     public OrderResponse removeLine(@PathVariable Long id, @PathVariable Long lineId) throws DomainException {
         Order order = removeOrderLineUseCase.execute(id, lineId);
         return orderMapper.toResponse(order);
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get an order by ID",
+            description = "Returns the full order with all its lines.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order found",
+                    content = @Content(schema = @Schema(implementation = OrderResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Order not found")
+    })
     public OrderResponse getOrder(@PathVariable Long id) throws DomainException {
         Order order = getOrderUseCase.getOrderById(id);
         return orderMapper.toResponse(order);
     }
 
     @GetMapping
-    public List<OrderResponse> getOrders(@RequestParam(required = false) Long customerId, @RequestParam(required = false) OrderStatus status) {
+    @Operation(summary = "List orders",
+            description = "Returns orders optionally filtered by customer ID and/or status.")
+    @ApiResponse(responseCode = "200", description = "List of orders",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = OrderResponse.class))))
+    public List<OrderResponse> getOrders(
+            @Parameter(description = "Filter by customer ID") @RequestParam(required = false) Long customerId,
+            @Parameter(description = "Filter by order status") @RequestParam(required = false) OrderStatus status) {
         List<Order> orders;
         if (customerId != null && status != null) {
             orders = listOrdersUseCase.listByCustomerIdAndStatus(customerId, status);
