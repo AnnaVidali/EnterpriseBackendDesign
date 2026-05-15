@@ -1,5 +1,6 @@
 package com.application.enterprisebackenddesign.api.invoice;
 
+import com.application.enterprisebackenddesign.api.shared.PageResponse;
 import com.application.enterprisebackenddesign.application.invoice.IssueInvoiceUseCase;
 import com.application.enterprisebackenddesign.application.invoice.ListInvoicesUseCase;
 import com.application.enterprisebackenddesign.domain.invoice.Invoice;
@@ -8,16 +9,14 @@ import com.application.enterprisebackenddesign.domain.invoice.InvoiceStatus;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/invoices")
@@ -68,24 +67,23 @@ public class InvoiceController {
 
     @GetMapping
     @Operation(summary = "List invoices",
-            description = "Returns invoices optionally filtered by customer ID and/or status.")
-    @ApiResponse(responseCode = "200", description = "List of invoices",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = InvoiceResponse.class))))
-    public List<InvoiceResponse> getInvoices(
+            description = "Returns a paginated list of invoices optionally filtered by customer ID and/or status.")
+    @ApiResponse(responseCode = "200", description = "Paginated list of invoices",
+            content = @Content(schema = @Schema(implementation = PageResponse.class)))
+    public PageResponse<InvoiceResponse> getInvoices(
             @Parameter(description = "Filter by customer ID") @RequestParam(required = false) Long customerId,
-            @Parameter(description = "Filter by invoice status") @RequestParam(required = false) InvoiceStatus status) {
-        List<Invoice> invoices;
+            @Parameter(description = "Filter by invoice status") @RequestParam(required = false) InvoiceStatus status,
+            @Parameter(description = "Pagination and sorting") @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        org.springframework.data.domain.Page<Invoice> invoicesPage;
         if (customerId != null && status != null) {
-            invoices = listInvoicesUseCase.listByCustomerIdAndStatus(customerId, status);
+            invoicesPage = listInvoicesUseCase.listByCustomerIdAndStatus(customerId, status, pageable);
         } else if (customerId != null) {
-            invoices = listInvoicesUseCase.listByCustomerId(customerId);
+            invoicesPage = listInvoicesUseCase.listByCustomerId(customerId, pageable);
         } else if (status != null) {
-            invoices = listInvoicesUseCase.listByStatus(status);
+            invoicesPage = listInvoicesUseCase.listByStatus(status, pageable);
         } else {
-            invoices = listInvoicesUseCase.listAll();
+            invoicesPage = listInvoicesUseCase.listAll(pageable);
         }
-        return invoices.stream()
-                .map(invoiceMapper::toResponse)
-                .collect(Collectors.toList());
+        return PageResponse.from(invoicesPage, invoicesPage.map(invoiceMapper::toResponse).getContent());
     }
 }

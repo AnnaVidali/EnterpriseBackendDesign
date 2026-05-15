@@ -3,6 +3,8 @@ package com.application.enterprisebackenddesign.infrastructure.persistence.custo
 import com.application.enterprisebackenddesign.domain.customer.Customer;
 import com.application.enterprisebackenddesign.domain.customer.CustomerRepository;
 import com.application.enterprisebackenddesign.infrastructure.persistence.customer.entity.CustomerEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -37,6 +39,11 @@ public class CustomerRepositoryImpl implements CustomerRepository {
                 .stream()
                 .map(customerMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Page<Customer> findAll(Pageable pageable) {
+        return customerRepository.findAll(pageable).map(customerMapper::toDomain);
     }
 
     @Override

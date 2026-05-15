@@ -1,5 +1,6 @@
 package com.application.enterprisebackenddesign.api.payment;
 
+import com.application.enterprisebackenddesign.api.shared.PageResponse;
 import com.application.enterprisebackenddesign.application.payment.ListPaymentsUseCase;
 import com.application.enterprisebackenddesign.application.payment.ProcessPaymentUseCase;
 import com.application.enterprisebackenddesign.domain.payment.Payment;
@@ -8,19 +9,17 @@ import com.application.enterprisebackenddesign.domain.payment.PaymentStatus;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -72,27 +71,26 @@ public class PaymentController {
 
     @GetMapping
     @Operation(summary = "List payments",
-            description = "Returns payments optionally filtered by invoice ID, customer ID, and/or status.")
-    @ApiResponse(responseCode = "200", description = "List of payments",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PaymentResponse.class))))
-    public List<PaymentResponse> getPayments(
+            description = "Returns a paginated list of payments optionally filtered by invoice ID, customer ID, and/or status.")
+    @ApiResponse(responseCode = "200", description = "Paginated list of payments",
+            content = @Content(schema = @Schema(implementation = PageResponse.class)))
+    public PageResponse<PaymentResponse> getPayments(
             @Parameter(description = "Filter by invoice ID") @RequestParam(required = false) Long invoiceId,
             @Parameter(description = "Filter by customer ID") @RequestParam(required = false) Long customerId,
-            @Parameter(description = "Filter by payment status") @RequestParam(required = false) PaymentStatus status) {
-        List<Payment> payments;
+            @Parameter(description = "Filter by payment status") @RequestParam(required = false) PaymentStatus status,
+            @Parameter(description = "Pagination and sorting") @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        org.springframework.data.domain.Page<Payment> paymentsPage;
         if (invoiceId != null && customerId != null && status != null) {
-            payments = listPaymentsUseCase.listByInvoiceIdAndCustomerIdAndStatus(invoiceId, customerId, status);
+            paymentsPage = listPaymentsUseCase.listByInvoiceIdAndCustomerIdAndStatus(invoiceId, customerId, status, pageable);
         } else if (invoiceId != null) {
-            payments = listPaymentsUseCase.listByInvoiceId(invoiceId);
-        }else if (customerId != null) {
-            payments = listPaymentsUseCase.listByCustomerId(customerId);
+            paymentsPage = listPaymentsUseCase.listByInvoiceId(invoiceId, pageable);
+        } else if (customerId != null) {
+            paymentsPage = listPaymentsUseCase.listByCustomerId(customerId, pageable);
         } else if (status != null) {
-            payments = listPaymentsUseCase.listByStatus(status);
+            paymentsPage = listPaymentsUseCase.listByStatus(status, pageable);
         } else {
-            payments = listPaymentsUseCase.listAll();
+            paymentsPage = listPaymentsUseCase.listAll(pageable);
         }
-        return payments.stream()
-                .map(paymentMapper::toResponse)
-                .collect(Collectors.toList());
+        return PageResponse.from(paymentsPage, paymentsPage.map(paymentMapper::toResponse).getContent());
     }
 }

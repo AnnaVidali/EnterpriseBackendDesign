@@ -4,6 +4,8 @@ import com.application.enterprisebackenddesign.domain.product.Product;
 import com.application.enterprisebackenddesign.domain.product.ProductRepository;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import com.application.enterprisebackenddesign.infrastructure.persistence.product.entity.ProductEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,6 +26,11 @@ public class ProductRepositoryImpl implements ProductRepository {
         return productRepository.findAll().stream()
                 .map(productMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Page<Product> findAll(Pageable pageable) {
+        return productRepository.findAll(pageable).map(productMapper::toDomain);
     }
 
     @Override

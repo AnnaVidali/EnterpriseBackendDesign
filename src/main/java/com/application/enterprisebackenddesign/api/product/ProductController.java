@@ -1,20 +1,22 @@
 package com.application.enterprisebackenddesign.api.product;
 
+import com.application.enterprisebackenddesign.api.shared.PageResponse;
 import com.application.enterprisebackenddesign.application.product.*;
 import com.application.enterprisebackenddesign.domain.product.Product;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -67,14 +69,13 @@ public class ProductController {
 
     @GetMapping
     @Operation(summary = "List all products",
-            description = "Returns a list of all products in the catalog. This endpoint is public (no authentication required).")
-    @ApiResponse(responseCode = "200", description = "List of products",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProductResponse.class))))
-    public List<ProductResponse> getAllProducts() {
-        List<Product> products = listProductsUseCase.listAll();
-        return products.stream()
-                .map(productMapper::toResponse)
-                .collect(java.util.stream.Collectors.toList());
+            description = "Returns a paginated list of all products in the catalog. This endpoint is public (no authentication required).")
+    @ApiResponse(responseCode = "200", description = "Paginated list of products",
+            content = @Content(schema = @Schema(implementation = PageResponse.class)))
+    public PageResponse<ProductResponse> getAllProducts(
+            @Parameter(description = "Pagination and sorting") @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        var productsPage = listProductsUseCase.listAll(pageable);
+        return PageResponse.from(productsPage, productsPage.map(productMapper::toResponse).getContent());
     }
 
     @PutMapping("/{id}")

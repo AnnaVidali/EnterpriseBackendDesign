@@ -4,6 +4,8 @@ import com.application.enterprisebackenddesign.domain.order.Order;
 import com.application.enterprisebackenddesign.domain.order.OrderRepository;
 import com.application.enterprisebackenddesign.domain.order.OrderStatus;
 import com.application.enterprisebackenddesign.infrastructure.persistence.order.entity.OrderEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -42,11 +44,23 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public Page<Order> findByStatus(OrderStatus status, Pageable pageable) {
+        return repository.findByStatus(status, pageable)
+                .map(orderMapper::toDomain);
+    }
+
+    @Override
     public List<Order> findAll() {
         return repository.findAll()
                 .stream()
                 .map(orderMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Page<Order> findAll(Pageable pageable) {
+        return repository.findAll(pageable)
+                .map(orderMapper::toDomain);
     }
 
     @Override
@@ -58,10 +72,22 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public Page<Order> findByCustomerId(Long customerId, Pageable pageable) {
+        return repository.findByCustomerId(customerId, pageable)
+                .map(orderMapper::toDomain);
+    }
+
+    @Override
     public List<Order> findByCustomerIdAndStatus(Long customerId, OrderStatus status) {
         return repository.findByCustomerIdAndStatus(customerId, status)
                 .stream()
                 .map(orderMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Page<Order> findByCustomerIdAndStatus(Long customerId, OrderStatus status, Pageable pageable) {
+        return repository.findByCustomerIdAndStatus(customerId, status, pageable)
+                .map(orderMapper::toDomain);
     }
 }

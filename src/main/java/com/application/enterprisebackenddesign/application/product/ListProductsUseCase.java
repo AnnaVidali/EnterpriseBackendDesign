@@ -3,6 +3,8 @@ package com.application.enterprisebackenddesign.application.product;
 import com.application.enterprisebackenddesign.domain.product.Product;
 import com.application.enterprisebackenddesign.domain.product.ProductRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,5 +20,9 @@ public class ListProductsUseCase {
 
     public List<Product> listAll() {
         return productRepository.findAll();
+    }
+
+    public Page<Product> listAll(Pageable pageable) {
+        return productRepository.findAll(pageable);
     }
 }

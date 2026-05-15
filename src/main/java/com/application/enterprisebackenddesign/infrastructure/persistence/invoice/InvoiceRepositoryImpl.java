@@ -4,6 +4,8 @@ import com.application.enterprisebackenddesign.domain.invoice.Invoice;
 import com.application.enterprisebackenddesign.domain.invoice.InvoiceRepository;
 import com.application.enterprisebackenddesign.domain.invoice.InvoiceStatus;
 import com.application.enterprisebackenddesign.infrastructure.persistence.invoice.entity.InvoiceEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -43,8 +45,18 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
     }
 
     @Override
+    public Page<Invoice> findByCustomerId(Long customerId, Pageable pageable) {
+        return repository.findByCustomerId(customerId, pageable).map(invoiceMapper::toDomain);
+    }
+
+    @Override
     public List<Invoice> findByStatus(InvoiceStatus status) {
         return repository.findByStatus(status).stream().map(invoiceMapper::toDomain).toList();
+    }
+
+    @Override
+    public Page<Invoice> findByStatus(InvoiceStatus status, Pageable pageable) {
+        return repository.findByStatus(status, pageable).map(invoiceMapper::toDomain);
     }
 
     @Override
@@ -56,10 +68,20 @@ public class InvoiceRepositoryImpl implements InvoiceRepository {
     }
 
     @Override
+    public Page<Invoice> findByCustomerIdAndStatus(Long customerId, InvoiceStatus status, Pageable pageable) {
+        return repository.findByCustomerIdAndStatus(customerId, status, pageable).map(invoiceMapper::toDomain);
+    }
+
+    @Override
     public List<Invoice> findAll() {
         return repository.findAll().stream()
                 .map(invoiceMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Page<Invoice> findAll(Pageable pageable) {
+        return repository.findAll(pageable).map(invoiceMapper::toDomain);
     }
 
 }

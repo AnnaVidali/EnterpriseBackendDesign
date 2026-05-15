@@ -2,6 +2,8 @@ package com.application.enterprisebackenddesign.application.customer;
 
 import com.application.enterprisebackenddesign.domain.customer.Customer;
 import com.application.enterprisebackenddesign.domain.customer.CustomerRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,5 +19,9 @@ public class ListCustomersUseCase {
 
     public List<Customer> listAll() {
         return customerRepository.findAll();
+    }
+
+    public Page<Customer> listAll(Pageable pageable) {
+        return customerRepository.findAll(pageable);
     }
 }

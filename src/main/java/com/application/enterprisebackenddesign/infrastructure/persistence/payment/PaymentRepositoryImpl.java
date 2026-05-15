@@ -4,6 +4,8 @@ import com.application.enterprisebackenddesign.domain.payment.Payment;
 import com.application.enterprisebackenddesign.domain.payment.PaymentRepository;
 import com.application.enterprisebackenddesign.domain.payment.PaymentStatus;
 import com.application.enterprisebackenddesign.infrastructure.persistence.payment.entity.PaymentEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -40,8 +42,18 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     }
 
     @Override
+    public Page<Payment> findAll(Pageable pageable) {
+        return paymentRepository.findAll(pageable).map(paymentMapper::toDomain);
+    }
+
+    @Override
     public List<Payment> findByInvoiceId(Long invoiceId) {
         return paymentRepository.findByInvoiceId(invoiceId).stream().map(paymentMapper::toDomain).toList();
+    }
+
+    @Override
+    public Page<Payment> findByInvoiceId(Long invoiceId, Pageable pageable) {
+        return paymentRepository.findByInvoiceId(invoiceId, pageable).map(paymentMapper::toDomain);
     }
 
     @Override
@@ -50,13 +62,28 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     }
 
     @Override
+    public Page<Payment> findByCustomerId(Long customerId, Pageable pageable) {
+        return paymentRepository.findByCustomerId(customerId, pageable).map(paymentMapper::toDomain);
+    }
+
+    @Override
     public List<Payment> findByStatus(PaymentStatus status) {
         return paymentRepository.findByStatus(status).stream().map(paymentMapper::toDomain).toList();
     }
 
     @Override
+    public Page<Payment> findByStatus(PaymentStatus status, Pageable pageable) {
+        return paymentRepository.findByStatus(status, pageable).map(paymentMapper::toDomain);
+    }
+
+    @Override
     public List<Payment> findByInvoiceIdAndCustomerIdAndStatus(Long invoiceId, Long customerId, PaymentStatus status) {
         return paymentRepository.findByInvoiceIdAndCustomerIdAndStatus(invoiceId, customerId, status).stream().map(paymentMapper::toDomain).toList();
+    }
+
+    @Override
+    public Page<Payment> findByInvoiceIdAndCustomerIdAndStatus(Long invoiceId, Long customerId, PaymentStatus status, Pageable pageable) {
+        return paymentRepository.findByInvoiceIdAndCustomerIdAndStatus(invoiceId, customerId, status, pageable).map(paymentMapper::toDomain);
     }
 
 }

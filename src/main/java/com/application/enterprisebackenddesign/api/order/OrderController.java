@@ -1,5 +1,6 @@
 package com.application.enterprisebackenddesign.api.order;
 
+import com.application.enterprisebackenddesign.api.shared.PageResponse;
 import com.application.enterprisebackenddesign.application.order.*;
 import com.application.enterprisebackenddesign.domain.order.Order;
 import com.application.enterprisebackenddesign.domain.order.OrderStatus;
@@ -13,11 +14,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Currency;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -161,24 +163,23 @@ public class OrderController {
 
     @GetMapping
     @Operation(summary = "List orders",
-            description = "Returns orders optionally filtered by customer ID and/or status.")
-    @ApiResponse(responseCode = "200", description = "List of orders",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = OrderResponse.class))))
-    public List<OrderResponse> getOrders(
+            description = "Returns a paginated list of orders optionally filtered by customer ID and/or status.")
+    @ApiResponse(responseCode = "200", description = "Paginated list of orders",
+            content = @Content(schema = @Schema(implementation = PageResponse.class)))
+    public PageResponse<OrderResponse> getOrders(
             @Parameter(description = "Filter by customer ID") @RequestParam(required = false) Long customerId,
-            @Parameter(description = "Filter by order status") @RequestParam(required = false) OrderStatus status) {
-        List<Order> orders;
+            @Parameter(description = "Filter by order status") @RequestParam(required = false) OrderStatus status,
+            @Parameter(description = "Pagination and sorting") @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        org.springframework.data.domain.Page<Order> ordersPage;
         if (customerId != null && status != null) {
-            orders = listOrdersUseCase.listByCustomerIdAndStatus(customerId, status);
+            ordersPage = listOrdersUseCase.listByCustomerIdAndStatus(customerId, status, pageable);
         } else if (customerId != null) {
-            orders = listOrdersUseCase.listByCustomerId(customerId);
+            ordersPage = listOrdersUseCase.listByCustomerId(customerId, pageable);
         } else if (status != null) {
-            orders = listOrdersUseCase.listByStatus(status);
+            ordersPage = listOrdersUseCase.listByStatus(status, pageable);
         } else {
-            orders = listOrdersUseCase.listAll();
+            ordersPage = listOrdersUseCase.listAll(pageable);
         }
-        return orders.stream()
-                .map(orderMapper::toResponse)
-                .collect(Collectors.toList());
+        return PageResponse.from(ordersPage, ordersPage.map(orderMapper::toResponse).getContent());
     }
 }

@@ -1,19 +1,21 @@
 package com.application.enterprisebackenddesign.api.customer;
 
+import com.application.enterprisebackenddesign.api.shared.PageResponse;
 import com.application.enterprisebackenddesign.application.customer.*;
 import com.application.enterprisebackenddesign.domain.customer.Customer;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -66,14 +68,13 @@ public class CustomerController {
 
     @GetMapping
     @Operation(summary = "List all customers",
-            description = "Returns a list of all registered customers.")
-    @ApiResponse(responseCode = "200", description = "List of customers",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = CustomerResponse.class))))
-    public List<CustomerResponse> getAllCustomers() {
-        List<Customer> customers = listCustomersUseCase.listAll();
-        return customers.stream()
-                .map(customerMapper::toResponse)
-                .collect(java.util.stream.Collectors.toList());
+            description = "Returns a paginated list of all registered customers.")
+    @ApiResponse(responseCode = "200", description = "Paginated list of customers",
+            content = @Content(schema = @Schema(implementation = PageResponse.class)))
+    public PageResponse<CustomerResponse> getAllCustomers(
+            @Parameter(description = "Pagination and sorting") @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        var customersPage = listCustomersUseCase.listAll(pageable);
+        return PageResponse.from(customersPage, customersPage.map(customerMapper::toResponse).getContent());
     }
 
     @PutMapping("/{id}")
