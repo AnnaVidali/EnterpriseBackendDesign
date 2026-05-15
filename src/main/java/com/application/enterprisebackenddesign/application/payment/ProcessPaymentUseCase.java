@@ -1,6 +1,7 @@
 package com.application.enterprisebackenddesign.application.payment;
 
 import com.application.enterprisebackenddesign.application.shared.DomainEventPublisher;
+import com.application.enterprisebackenddesign.application.shared.IdGenerator;
 import com.application.enterprisebackenddesign.domain.invoice.Invoice;
 import com.application.enterprisebackenddesign.domain.invoice.InvoiceRepository;
 import com.application.enterprisebackenddesign.domain.invoice.InvoiceStatus;
@@ -14,8 +15,6 @@ import com.application.enterprisebackenddesign.infrastructure.external.PaymentRe
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 @Transactional
 public class ProcessPaymentUseCase {
@@ -24,12 +23,14 @@ public class ProcessPaymentUseCase {
     private final InvoiceRepository invoiceRepository;
     private final DomainEventPublisher eventPublisher;
     private final PaymentGateway paymentGateway;
+    private final IdGenerator idGenerator;
 
-    public ProcessPaymentUseCase(PaymentRepository paymentRepository, InvoiceRepository invoiceRepository, DomainEventPublisher eventPublisher, PaymentGateway paymentGateway) {
+    public ProcessPaymentUseCase(PaymentRepository paymentRepository, InvoiceRepository invoiceRepository, DomainEventPublisher eventPublisher, PaymentGateway paymentGateway, IdGenerator idGenerator) {
         this.paymentRepository = paymentRepository;
         this.invoiceRepository = invoiceRepository;
         this.eventPublisher = eventPublisher;
         this.paymentGateway = paymentGateway;
+        this.idGenerator = idGenerator;
     }
 
     public Payment execute(Long invoiceID, Money paymentAmount) throws DomainException {
@@ -37,8 +38,7 @@ public class ProcessPaymentUseCase {
         if (!InvoiceStatus.ISSUED.equals(invoice.getStatus())) {
             throw new DomainException.BusinessRuleViolationException("Invoice status is not ISSUED");
         }
-        Long paymentId = generatePaymentId();
-        Payment payment = new Payment(paymentId, invoice.getId(), invoice.getOrderId(), invoice.getCustomerId(), paymentAmount, com.application.enterprisebackenddesign.domain.payment.PaymentStatus.PENDING);
+        Payment payment = new Payment(idGenerator.generateId(), invoice.getId(), invoice.getOrderId(), invoice.getCustomerId(), paymentAmount, com.application.enterprisebackenddesign.domain.payment.PaymentStatus.PENDING);
         if (!payment.matchesInvoice(invoice.getAmount())) {
             throw new DomainException.BusinessRuleViolationException("Payment amount does not match invoice amount.");
         }
@@ -60,7 +60,4 @@ public class ProcessPaymentUseCase {
         return payment;
     }
 
-    private Long generatePaymentId() {
-        return UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
-    }
 }
