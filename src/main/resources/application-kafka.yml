@@ -1,0 +1,15 @@
+spring:
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.type.mapping: "domainEvent:com.application.enterprisebackenddesign.domain.shared.DomainEvent"
+        spring.json.use.type.headers: false
+        spring.json.add.type.headers: false
+
+app:
+  kafka:
+    topics:
+      partitions: 1
+      replication-factor: 1
