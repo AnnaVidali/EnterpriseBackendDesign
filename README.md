@@ -13,15 +13,15 @@ An Enterprise Order and Billing Service built with Spring Boot 4, implementing D
 
 ## Architecture
 
-The project follows Domain-Driven Design with a layered architecture:
+The project follows Domain-Driven Design with a Hexagonal (Ports & Adapters) architecture:
 
 ```
 src/main/java/com/application/enterprisebackenddesign/
-├── domain/           # Core business logic (entities, value objects, domain events)
-├── application/      # Use cases and application services
-├── infrastructure/   # Persistence, messaging, security, external integrations
-├── api/              # REST controllers with OpenAPI documentation
-└── config/           # Application configuration
+├── domain/           # Core business logic (entities, value objects, domain events, repository ports)
+├── application/      # Use cases and application services (orchestrates domain logic)
+├── infrastructure/   # Adapters: persistence (JPA), messaging (Kafka), security (JWT), external integrations
+├── api/              # Inbound adapters: REST controllers with OpenAPI documentation
+└── config/           # Spring configuration and bean wiring
 ```
 
 ## Domain Features
@@ -116,6 +116,13 @@ Since Flyway Community Edition does not support `undo` migrations, manual rollba
 
 **Note**: V7 drops all tables. Export any needed data before rolling back.
 
+## Authentication
+
+All endpoints except `GET /api/products` and `POST /api/auth/login` require a Bearer JWT token.
+
+### Auth (`/api/auth`)
+- `POST /api/auth/login` - Authenticate and receive JWT token
+
 ## API Endpoints
 
 ### Customers (`/api/customers`)
@@ -134,12 +141,12 @@ Since Flyway Community Edition does not support `undo` migrations, manual rollba
 
 ### Orders (`/api/orders`)
 - `POST /api/orders` - Create order
-- `GET /api/orders` - List orders (paginated)
+- `GET /api/orders` - List orders (paginated, filterable by `customerId`, `status`)
 - `GET /api/orders/{id}` - Get order by ID
 - `POST /api/orders/{id}/confirm` - Confirm order
 - `POST /api/orders/{id}/cancel` - Cancel order
 - `POST /api/orders/{id}/lines` - Add order line
-- `PUT /api/orders/{id}/lines/{lineId}` - Update order line
+- `PUT /api/orders/{id}/lines/{lineId}` - Update order line quantity
 - `DELETE /api/orders/{id}/lines/{lineId}` - Remove order line
 
 ### Invoices (`/api/invoices`)
@@ -148,8 +155,8 @@ Since Flyway Community Edition does not support `undo` migrations, manual rollba
 - `GET /api/invoices/{id}` - Get invoice by ID
 
 ### Payments (`/api/payments`)
-- `POST /api/payments` - Process payment
-- `GET /api/payments` - List payments (paginated, filterable)
+- `POST /api/payments` - Process payment against an invoice
+- `GET /api/payments` - List payments (paginated, filterable by `invoiceId`, `customerId`, `status`)
 - `GET /api/payments/{id}` - Get payment by ID
 
 ## Testing
@@ -164,6 +171,13 @@ Uses Testcontainers for PostgreSQL and Kafka.
 - **Controller integration tests**: `api/*/...IntegrationTest.java` (35 tests)
 - **Repository integration tests**: `infrastructure/persistence/*/...IntegrationTest.java` (40 tests)
 - **Unit tests**: Domain model, event handlers, ID generator
+
+### Static Analysis
+
+SpotBugs is integrated via Maven plugin:
+```bash
+./mvnw spotbugs:check
+```
 
 ## Building
 
