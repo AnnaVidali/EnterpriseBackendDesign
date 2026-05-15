@@ -4,6 +4,7 @@ import com.application.enterprisebackenddesign.domain.product.Product;
 import com.application.enterprisebackenddesign.domain.product.ProductRepository;
 import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import com.application.enterprisebackenddesign.infrastructure.persistence.product.entity.ProductEntity;
+import com.application.enterprisebackenddesign.infrastructure.persistence.shared.MoneyEmbeddable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -41,8 +42,17 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     @Override
     public Product save(Product product) throws DomainException {
-        ProductEntity productEntity = productMapper.toEntity(product);
-        ProductEntity saved = productRepository.save(productEntity);
+        ProductEntity saved;
+        var existing = productRepository.findById(product.getId());
+        if (existing.isPresent()) {
+            ProductEntity entity = existing.get();
+            entity.setName(product.getName());
+            entity.setSku(product.getSku());
+            entity.setPrice(MoneyEmbeddable.fromDomain(product.getPrice()));
+            saved = productRepository.save(entity);
+        } else {
+            saved = productRepository.save(productMapper.toEntity(product));
+        }
         return productMapper.toDomain(saved);
     }
 

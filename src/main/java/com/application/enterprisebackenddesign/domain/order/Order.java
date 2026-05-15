@@ -18,7 +18,11 @@ public class Order {
     private final List<DomainEvent> events = new ArrayList<>();
 
     public Order(Long id, Long customerId, List<OrderLine> orderLines, Currency currency) throws DomainException.BusinessRuleViolationException {
+        this(id, customerId, orderLines, currency, OrderStatus.CREATED);
+        events.add(new OrderCreatedEvent(this.id, this.customerId, this.orderLines.size()));
+    }
 
+    public Order(Long id, Long customerId, List<OrderLine> orderLines, Currency currency, OrderStatus status) throws DomainException.BusinessRuleViolationException {
         if(id == null){
             throw new DomainException.BusinessRuleViolationException("Id cannot be null.");
         }
@@ -33,11 +37,10 @@ public class Order {
         if(currency == null){
             throw new DomainException.BusinessRuleViolationException("Currency cannot be null.");
         }
-        this.status = OrderStatus.CREATED;
+        this.status = status;
         this.orderLines = new ArrayList<>(orderLines);
         this.currency = currency;
         this.totalAmount = calculateTotal();
-        events.add(new OrderCreatedEvent(this.id, this.customerId, this.orderLines.size()));
     }
 
     public void addLine(OrderLine orderLine) throws DomainException.BusinessRuleViolationException {

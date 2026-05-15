@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 public record ProductRequest (
 
     @NotNull @NotBlank String name,
-    @NotNull @NotBlank @Positive BigDecimal price,
+    @NotNull @Positive BigDecimal price,
     @NotNull @NotBlank String currency,
     @NotNull @NotBlank String sku
 

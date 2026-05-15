@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 public class CustomerEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -38,5 +37,5 @@ public class CustomerEntity {
     private LocalDateTime lastModifiedDate;
 
     @Version
-    private Long version;
+    private Long version = 0L;
 }

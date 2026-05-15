@@ -17,6 +17,6 @@ public class GetOrderUseCase {
     }
 
     public Order getOrderById(Long id) throws DomainException {
-        return orderRepository.findById(id).orElseThrow(() -> new DomainException("Order not found."));
+        return orderRepository.findById(id).orElseThrow(() -> new DomainException.ResourceNotFoundException("Order not found."));
     }
 }

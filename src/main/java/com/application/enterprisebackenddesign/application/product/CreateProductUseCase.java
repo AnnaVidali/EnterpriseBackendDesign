@@ -25,7 +25,7 @@ public class CreateProductUseCase {
 
     public Product create(Long id, ProductRequest request) throws DomainException {
         if (productRepository.findBySku(request.sku()).isPresent()) {
-            throw new DomainException("SKU is not unique.");
+            throw new DomainException.BusinessRuleViolationException("SKU is not unique.");
         }
 
         Currency currency = Currency.getInstance(request.currency());

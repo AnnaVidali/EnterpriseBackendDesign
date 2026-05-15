@@ -23,7 +23,7 @@ public class UpdateProductUseCase {
     }
 
     public Product update(Long id, ProductRequest request) throws DomainException {
-        Product product = productRepository.findById(id).orElseThrow(() -> new DomainException("Product not found"));
+        Product product = productRepository.findById(id).orElseThrow(() -> new DomainException.ResourceNotFoundException("Product not found"));
         if (request.name() != null && !request.name().isEmpty()) {
             product.updateName(request.name());
         }

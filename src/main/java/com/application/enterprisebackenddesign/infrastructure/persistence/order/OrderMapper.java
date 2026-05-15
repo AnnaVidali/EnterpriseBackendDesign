@@ -45,7 +45,8 @@ public class OrderMapper {
                     entity.getId(),
                     entity.getCustomerId(),
                     orderLines,
-                    Currency.getInstance(entity.getCurrency())
+                    Currency.getInstance(entity.getCurrency()),
+                    entity.getStatus()
             );
         } catch (DomainException.BusinessRuleViolationException e) {
             throw new RuntimeException("Failed to create Order from entity", e);

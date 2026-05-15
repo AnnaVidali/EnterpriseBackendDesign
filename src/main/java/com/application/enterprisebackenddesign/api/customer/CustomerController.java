@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -48,7 +49,7 @@ public class CustomerController {
                     content = @Content(schema = @Schema(implementation = CustomerResponse.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request body")
     })
-    public CustomerResponse createCustomer(@RequestBody CustomerRequest customerRequest) throws DomainException {
+    public CustomerResponse createCustomer(@RequestBody @Valid CustomerRequest customerRequest) throws DomainException {
         Customer customer = createCustomerUseCase.create(UUID.randomUUID().getMostSignificantBits(), customerRequest);
         return customerMapper.toResponse(customer);
     }
