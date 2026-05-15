@@ -4,6 +4,9 @@ import com.application.enterprisebackenddesign.domain.invoice.InvoiceStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,6 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @Table(name = "invoices")
+@EntityListeners(AuditingEntityListener.class)
 public class InvoiceEntity {
 
     @Id
@@ -35,4 +39,15 @@ public class InvoiceEntity {
 
     @Column
     private LocalDateTime invoiceDate;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdDate;
+
+    @LastModifiedDate
+    @Column(nullable = false)
+    private LocalDateTime lastModifiedDate;
+
+    @Version
+    private Long version = 0L;
 }

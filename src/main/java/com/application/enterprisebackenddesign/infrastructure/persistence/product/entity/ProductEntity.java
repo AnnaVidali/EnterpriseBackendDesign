@@ -37,5 +37,5 @@ public class ProductEntity {
     private LocalDateTime lastModifiedDate;
 
     @Version
-    private Long version;
+    private Long version = 0L;
 }
