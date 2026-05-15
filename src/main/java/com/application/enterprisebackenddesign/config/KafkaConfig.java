@@ -17,6 +17,23 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Kafka messaging infrastructure configuration.
+ *
+ * Hexagonal Architecture (infrastructure layer): This config sets up the
+ * external messaging channel for domain events. Each aggregate type gets
+ * its own topic (order-events, invoice-events, etc.), allowing downstream
+ * consumers to subscribe only to what they need.
+ *
+ * The topics, partitions, and replication factors are configurable via
+ * application properties (app.kafka.topics.*). In production, the
+ * replication factor should match the Kafka cluster size for fault tolerance.
+ *
+ * Integration with the port/adapter pattern: The KafkaTemplate bean created
+ * here is used by KafkaEventPublisher, which implements the "publish events
+ * to external systems" concern. The domain events flow: use case →
+ * DomainEventPublisher → SpringApplicationEvent → KafkaEventPublisher → Kafka.
+ */
 @Configuration
 public class KafkaConfig {
 

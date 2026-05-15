@@ -17,6 +17,30 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * Integration tests for the Customer REST API.
+ *
+ * Interview context: This is a true integration test — it starts the full
+ * Spring Boot context, spins up real PostgreSQL + Kafka via Testcontainers,
+ * and tests the complete HTTP request/response cycle through MockMvc.
+ *
+ * Testing strategy:
+ * 1. @SpringBootTest loads the full application context (all beans, security, JPA, etc.)
+ * 2. @Import(TestcontainersConfiguration.class) provides real PostgreSQL + Kafka
+ * 3. @AutoConfigureMockMvc allows testing HTTP endpoints without a running server
+ * 4. @Sql cleans up between tests — critical because MockMvc runs in separate
+ *    threads/transactions, so @Transactional on the test class would NOT roll back
+ *    data written by MockMvc requests (a common Spring Boot 4.x gotcha)
+ * 5. JWT auth header is generated in @BeforeEach using the real JwtProvider
+ *
+ * We test both success scenarios (201 Created, 200 OK) AND error scenarios
+ * (400 validation errors, 404 not found) to ensure the full error handling
+ * pipeline works from the controller through to the HTTP response.
+ *
+ * See also CustomerRepositoryImplIntegrationTest which tests the persistence
+ * layer in isolation. The two test levels give us confidence at different
+ * granularities: fast, focused repository tests + slower, comprehensive API tests.
+ */
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @AutoConfigureMockMvc

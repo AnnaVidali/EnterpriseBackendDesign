@@ -11,6 +11,16 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Adapter implementation of the PaymentRepository port.
+ *
+ * Hexagonal Architecture: Implements PaymentRepository using Spring Data JPA.
+ * The domain Payment aggregate is mapped to/from PaymentEntity via PaymentMapper.
+ *
+ * This is the simplest repository adapter — PaymentEntity has no child
+ * entities and no special cascade behavior. The save/find pattern is
+ * straightforward.
+ */
 @Repository
 public class PaymentRepositoryImpl implements PaymentRepository {
 

@@ -8,6 +8,14 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+/**
+ * Async event handler: propagates product changes to the inventory system.
+ *
+ * DDD domain event pattern: ProductUpdatedEvent is published when product
+ * details change. This handler pushes the updated field to the inventory
+ * system, maintaining eventual consistency between catalog and inventory
+ * bounded contexts.
+ */
 @Component
 public class ProductUpdatedEventHandler {
     private static final Logger log = LoggerFactory.getLogger(ProductUpdatedEventHandler.class);

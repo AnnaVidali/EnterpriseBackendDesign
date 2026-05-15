@@ -11,6 +11,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Currency;
 
+/**
+ * Use case for creating a new product. Validates SKU uniqueness,
+ * constructs the product aggregate, persists it, and publishes
+ * domain events.
+ */
 @Service
 @Transactional
 public class CreateProductUseCase {

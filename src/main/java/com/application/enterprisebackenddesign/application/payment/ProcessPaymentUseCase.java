@@ -15,6 +15,37 @@ import com.application.enterprisebackenddesign.infrastructure.external.PaymentRe
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+/**
+ * Use case for processing a payment against an issued invoice.
+ * Validates the payment matches the invoice amount, delegates
+ * to an external payment gateway, and updates both payment and
+ * invoice aggregates accordingly.
+ *
+ * Interview context: This is the most complex use case in the system.
+ * It orchestrates multiple aggregates (Invoice + Payment), an external
+ * service (PaymentGateway), and domain events — all within a single
+ * @Transactional boundary. Key design points:
+ *
+ * 1. The @Transactional on the CLASS means ALL public methods run in
+ *    a transaction. If the gateway call succeeds but save fails, the
+ *    entire operation rolls back — the customer isn't charged without
+ *    a recorded payment.
+ *
+ * 2. Event publication happens AFTER persistence (line 58: pullEvents
+ *    is called after save). This prevents the "event published but
+ *    transaction rolled back" race condition. If the save throws an
+ *    exception, the events are never published because the method
+ *    exits via exception before reaching the publish call.
+ *
+ * 3. The PaymentGateway interface isolates us from Stripe SDK changes.
+ *    In tests, we mock it to simulate gateway failures and timeouts.
+ *
+ * 4. matchesInvoice() is called BEFORE the gateway — fail fast on
+ *    amount mismatch saves an expensive HTTP call to Stripe.
+ *
+ * 5. ID generation uses IdGenerator (SecureRandom) instead of DB
+ *    sequences, keeping the domain model persistence-agnostic.
+ */
 @Service
 @Transactional
 public class ProcessPaymentUseCase {

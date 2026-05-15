@@ -4,6 +4,25 @@ import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import com.application.enterprisebackenddesign.domain.shared.Money;
 import lombok.Getter;
 
+/**
+ * Value object representing a single line item within an order.
+ * Identified by a unique line id and composed of a product reference,
+ * quantity, and unit price. Two order lines with the same id are
+ * considered equal.
+ *
+ * Interview context: OrderLine is part of the Order aggregate root,
+ * not a separate aggregate. It has no independent repository — it's
+ * loaded and saved through the Order. All modifications must go
+ * through Order methods which enforce aggregate invariants.
+ *
+ * Key decisions:
+ * 1. withQuantity() returns a NEW OrderLine — immutability for safety.
+ * 2. equals/hashCode based on ID — allows Order to use indexOf/contains.
+ * 3. No @Version here — optimistic locking is on the Order aggregate root.
+ *    If two users modify different lines simultaneously, the Order's version
+ *    will fail on the second save (optimistic lock exception), preventing
+ *    concurrent modification even though lines are stored separately.
+ */
 @Getter
 public class OrderLine {
 

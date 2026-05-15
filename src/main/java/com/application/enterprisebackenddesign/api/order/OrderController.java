@@ -8,7 +8,6 @@ import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import com.application.enterprisebackenddesign.domain.shared.Money;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,6 +22,22 @@ import java.util.Currency;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * REST controller for the Order aggregate — the richest controller in the system.
+ *
+ * Hexagonal Architecture (Adapter layer): This controller is an inbound adapter
+ * that translates HTTP requests into use case calls and domain responses back
+ * into HTTP responses. It contains zero business logic — every operation
+ * delegates to a dedicated use case.
+ *
+ * The Order aggregate is the most complex domain object (it owns OrderLine children,
+ * has a lifecycle with status transitions, and holds a Money total). This controller
+ * demonstrates the full pattern: 8 endpoints covering CRUD, status transitions
+ * (confirm/cancel), and child entity management (add/update/remove lines).
+ *
+ * DDD principle: The controller works only with primitive/DTO types and never
+ * manipulates domain objects directly. The use cases handle all domain logic.
+ */
 @RestController
 @RequestMapping("/api/orders")
 @Tag(name = "Orders", description = "Order lifecycle management — create, confirm, cancel, and manage order lines")

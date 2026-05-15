@@ -14,6 +14,24 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * JWT authentication filter that intercepts every request.
+ *
+ * Interview context: This filter runs before Spring Security's standard
+ * authentication. It extracts the JWT from the Authorization header,
+ * validates it, and sets the SecurityContext. If the token is invalid
+ * or missing, the filter chain continues without authentication — the
+ * SecurityConfig then denies access for protected endpoints.
+ *
+ * Why OncePerRequestFilter? Spring's Filter base class can fire multiple
+ * times per request in some scenarios (e.g., forward/error dispatch).
+ * OncePerRequestFilter guarantees single execution, which is important
+ * for authentication to avoid redundant token parsing.
+ *
+ * The authentication token uses empty authorities (List.of()) because
+ * this project uses a simple role model. In a production system, you'd
+ * extract roles/authorities from the JWT claims.
+ */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 

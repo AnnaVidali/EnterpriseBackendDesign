@@ -8,6 +8,14 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+/**
+ * Async event handler: propagates order line changes to the CRM.
+ *
+ * DDD domain event pattern: Handles OrderLineUpdatedEvent (published when
+ * order line quantities change). The handler updates the CRM with the
+ * new order status. This keeps the CRM eventually consistent without
+ * requiring synchronous calls during order modification.
+ */
 @Component
 public class OrderUpdatedEventHandler {
     private static final Logger log = LoggerFactory.getLogger(OrderUpdatedEventHandler.class);

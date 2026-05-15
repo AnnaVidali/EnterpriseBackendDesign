@@ -2,6 +2,7 @@ package com.application.enterprisebackenddesign.application.customer;
 
 import com.application.enterprisebackenddesign.domain.customer.Customer;
 import com.application.enterprisebackenddesign.domain.customer.CustomerRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@Transactional
 public class ListCustomersUseCase {
 
     private final CustomerRepository customerRepository;

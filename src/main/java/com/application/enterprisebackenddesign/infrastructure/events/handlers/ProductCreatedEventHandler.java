@@ -8,6 +8,14 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+/**
+ * Async event handler: syncs new products to inventory and warehouse.
+ *
+ * DDD domain event pattern: ProductCreatedEvent is published when a new
+ * product is added to the catalog. This handler updates the inventory
+ * system and notifies the warehouse — two independent downstream systems
+ * that need to know about the new product.
+ */
 @Component
 public class ProductCreatedEventHandler {
     private static final Logger log = LoggerFactory.getLogger(ProductCreatedEventHandler.class);

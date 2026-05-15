@@ -8,6 +8,14 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+/**
+ * Async event handler: notifies accounting when an invoice is created.
+ *
+ * DDD domain event pattern: The InvoiceCreatedEvent is published by
+ * IssueInvoiceUseCase after a confirmed order is billed. This handler
+ * sends an email notification to the accounting department as a
+ * fire-and-forget side effect.
+ */
 @Component
 public class InvoiceCreatedEventHandler {
     private static final Logger log = LoggerFactory.getLogger(InvoiceCreatedEventHandler.class);

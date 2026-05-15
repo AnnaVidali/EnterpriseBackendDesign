@@ -8,6 +8,17 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+/**
+ * Async event handler: sends invoice notification to the customer.
+ *
+ * DDD domain event pattern: Handles InvoiceIssuedEvent (published after
+ * an invoice transitions to ISSUED status). This handler sends the
+ * invoice to the customer — a bounded context boundary where the billing
+ * system notifies the customer communication system.
+ *
+ * The customer email is hardcoded here (stub). In production it would
+ * be looked up from the Customer aggregate using the customerId.
+ */
 @Component
 public class InvoiceIssuedEventHandler {
     private static final Logger log = LoggerFactory.getLogger(InvoiceIssuedEventHandler.class);

@@ -19,6 +19,26 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+/**
+ * REST controller for customer operations.
+ *
+ * Interview context: Controllers are intentionally THIN. They handle:
+ * 1. HTTP concerns (request parsing, response format, status codes)
+ * 2. ID generation (via IdGenerator or UUID for backward compat)
+ * 3. Delegation to use cases for ALL business logic
+ *
+ * Notice there's NO business logic, NO validation beyond @Valid, and NO
+ * direct repository access here. That's the "Thin Controller, Fat Service"
+ * pattern — also known as the "Hexagonal Architecture" adapter layer.
+ *
+ * The use cases are injected as separate classes (one per operation), not
+ * a single monolithic service. This follows the Command/Query Separation
+ * pattern: each use case has one public method and one responsibility.
+ * This makes testing easier and prevents the "god service" anti-pattern.
+ *
+ * Swagger annotations (@Operation, @ApiResponse) provide OpenAPI docs
+ * automatically — no separate documentation maintenance needed.
+ */
 @RestController
 @RequestMapping("/api/customers")
 @Tag(name = "Customers", description = "CRUD operations for customer management")

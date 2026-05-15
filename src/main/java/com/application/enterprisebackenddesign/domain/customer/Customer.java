@@ -7,6 +7,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * Aggregate root representing a customer in the domain.
+ * Encapsulates customer identity, contact information, and domain events
+ * triggered by state changes such as creation, update, or deletion.
+ *
+ * Interview context: Customer is a simpler aggregate — it has no child
+ * entities (unlike Order which has OrderLines). It validates its own
+ * invariants (email format, non-empty name) in the constructor and raises
+ * events for every state change.
+ *
+ * The pullEvents/clear pattern: Domain events are collected in an in-memory
+ * list as the aggregate mutates. After the use case successfully persists
+ * the aggregate, it calls pullEvents(true) to atomically retrieve and clear
+ * the events, then publishes them. If persistence fails (e.g., optimistic
+ * lock exception, constraint violation), the events are never published —
+ * preventing the classic "event published but transaction rolled back" bug.
+ *
+ * This is NOT event sourcing — we store the current state, not the event
+ * stream. But the pattern is compatible with event sourcing if we later
+ * want to add an event store.
+ */
 @Getter
 public class Customer {
 
@@ -16,6 +37,13 @@ public class Customer {
     private String email;
     private final List<DomainEvent> events = new ArrayList<>();
 
+    /**
+     * @param id       unique identifier, must not be null
+     * @param name     customer first name, must not be null or empty
+     * @param lastName customer last name, must not be null or empty
+     * @param email    customer email address, must match a valid email format
+     * @throws DomainException.BusinessRuleViolationException if any validation fails
+     */
     public Customer(Long id, String name, String lastName, String email) throws DomainException.BusinessRuleViolationException {
         if (id == null) {
             throw new DomainException.BusinessRuleViolationException("Id cannot be null.");

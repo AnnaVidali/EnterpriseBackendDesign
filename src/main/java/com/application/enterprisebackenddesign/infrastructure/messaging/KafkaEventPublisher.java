@@ -9,6 +9,25 @@ import org.springframework.context.event.EventListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+/**
+ * External event publisher — fan-out from in-process events to Kafka topics.
+ *
+ * This class is a second event publishing channel alongside Spring's internal
+ * ApplicationEventPublisher. The flow is:
+ * 1. Use cases publish domain events via DomainEventPublisher interface
+ * 2. SpringDomainEventPublisher fires them as ApplicationEvents
+ * 3. This listener catches all DomainEvent subtypes and publishes to Kafka
+ *
+ * The resolveTopic() method maps event types to Kafka topics using an
+ * aggregate-based partitioning scheme. This achieves:
+ * - Temporal decoupling: The use case transaction completes before Kafka send
+ * - At-least-once delivery: Kafka provides persistence and replay
+ * - Consumer autonomy: Each microservice subscribes only to its relevant topics
+ *
+ * Tradeoff: The @EventListener on a generic DomainEvent parameter catches
+ * ALL domain events. This is intentional — it's a centralized fan-out point.
+ * Individual event handlers use @Async for fire-and-forget side effects.
+ */
 @Component
 public class KafkaEventPublisher {
 

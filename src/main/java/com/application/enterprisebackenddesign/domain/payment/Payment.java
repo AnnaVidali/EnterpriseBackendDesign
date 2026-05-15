@@ -8,6 +8,32 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Aggregate root representing a payment transaction against an invoice.
+ * Manages lifecycle from PENDING to COMPLETED or FAILED and validates
+ * that the payment amount matches the invoice before processing.
+ *
+ * Interview context: Payment is the final step in the order-to-cash flow.
+ * The ProcessPaymentUseCase creates a PENDING payment, calls the external
+ * gateway, then transitions to COMPLETED or FAILED based on the result.
+ *
+ * Important design decisions:
+ * 1. matchesInvoice() is called BEFORE calling the payment gateway —
+ *    failing fast on amount mismatch saves an expensive API call and
+ *    provides immediate feedback to the client.
+ * 2. The gateway integration is abstracted behind an interface (PaymentGateway),
+ *    allowing the use case to be tested without real HTTP calls.
+ * 3. Payment status transitions are strictly guarded: PENDING → COMPLETED
+ *    or PENDING → FAILED. You cannot retry a COMPLETED payment or complete
+ *    a FAILED one. This matches real payment gateway behavior.
+ * 4. paymentDate is set to null on creation and populated on completion —
+ *    null means "not yet completed", which is semantically clearer than
+ *    a sentinel date value.
+ * 5. ID generation uses a shared IdGenerator with SecureRandom (see
+ *    ticket 28). This was changed from UUID.randomUUID().getMostSignificantBits()
+ *    to avoid potential collisions under concurrent load and to make the
+ *    ID generation strategy explicit and testable.
+ */
 @Getter
 public class Payment {
 

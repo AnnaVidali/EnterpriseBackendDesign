@@ -12,6 +12,18 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Adapter implementation of the ProductRepository port.
+ *
+ * Hexagonal Architecture: Implements ProductRepository using Spring Data JPA.
+ * Notable: the save() method has a merge-or-create pattern (checks existence
+ * before persisting) because ProductRepository.save() is used for both create
+ * and update flows in the product use cases.
+ *
+ * The SKU uniqueness check is enforced at the database level via a unique
+ * constraint. The repository catches DataIntegrityViolationException in
+ * the use case layer and translates it to a domain BusinessRuleViolation.
+ */
 @Repository
 public class ProductRepositoryImpl implements ProductRepository {
     private final SpringDataProductRepository productRepository;

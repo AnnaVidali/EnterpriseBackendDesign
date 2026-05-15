@@ -19,6 +19,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * Spring Security configuration for JWT-based stateless authentication.
+ *
+ * Interview context: This configures the security filter chain with:
+ * 1. Stateless sessions (no HttpSession — every request carries the JWT).
+ * 2. Public endpoints: auth, Swagger docs, health check, product listing.
+ * 3. JWT filter added before UsernamePasswordAuthenticationFilter —
+ *    our filter sets the SecurityContext, then Spring Security uses it.
+ * 4. Custom 401 JSON response (not the default HTML error page) for
+ *    clean API error handling.
+ *
+ * The InMemoryUserDetailsManager is for development convenience. In production,
+ * you'd replace this with a JdbcUserDetailsManager or an OAuth2 resource server
+ * configuration. The PasswordEncoder (BCrypt) ensures passwords are never
+ * stored in plain text, even in development.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {

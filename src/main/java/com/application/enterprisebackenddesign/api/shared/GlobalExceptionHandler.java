@@ -18,6 +18,22 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * Centralized exception handler — the error boundary between domain and HTTP.
+ *
+ * Hexagonal Architecture (Adapter layer concern): This @RestControllerAdvice
+ * maps domain exceptions to HTTP status codes, keeping HTTP concerns out of
+ * the domain layer. The domain layer throws only DomainException subclasses;
+ * this handler decides whether they become 404 (ResourceNotFound), 400
+ * (BusinessRuleViolation), or 409 (DataIntegrityViolation).
+ *
+ * Key design decisions:
+ * - DomainExceptions map to 4xx status codes (client errors), never 5xx
+ * - Infrastructure exceptions (DataIntegrityViolation) are logged at WARN
+ *   and mapped to 409 CONFLICT to avoid leaking database internals
+ * - Unhandled exceptions (the catch-all) return 500 with a generic message
+ *   to avoid information leakage — the full stack trace is server-logged only
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

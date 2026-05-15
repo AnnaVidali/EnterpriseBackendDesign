@@ -9,6 +9,15 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+/**
+ * Async event handler: triggers analytics tracking and warehouse notification.
+ *
+ * DDD domain event pattern: OrderCreatedEvent is published when a new order
+ * is placed. This handler fires two independent side effects asynchronously:
+ * analytics tracking (business intelligence) and warehouse notification
+ * (inventory management). These are different bounded contexts that both
+ * consume the same event.
+ */
 @Component
 public class OrderCreatedEventHandler {
     private static final Logger log = LoggerFactory.getLogger(OrderCreatedEventHandler.class);

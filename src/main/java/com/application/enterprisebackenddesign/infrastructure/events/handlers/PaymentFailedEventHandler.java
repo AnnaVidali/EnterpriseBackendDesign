@@ -8,6 +8,15 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+/**
+ * Async event handler: sends payment failure alerts to customer and admin.
+ *
+ * DDD domain event pattern: PaymentFailedEvent is published by
+ * ProcessPaymentUseCase when the payment gateway rejects a transaction.
+ * This handler notifies two parties simultaneously — the customer (UX)
+ * and the admin (ops). Both notifications are fire-and-forget; the
+ * payment use case has already completed and recorded the failure.
+ */
 @Component
 public class PaymentFailedEventHandler {
     private static final Logger log = LoggerFactory.getLogger(PaymentFailedEventHandler.class);

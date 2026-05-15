@@ -6,6 +6,18 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository port for the Invoice aggregate.
+ *
+ * Hexagonal Architecture (Port): InvoiceRepository defines the persistence
+ * contract for invoices. It supports querying by orderId, customerId, and
+ * status — reflecting the three main access patterns in the billing workflow.
+ *
+ * Note: findByOrderId returns List<Invoice> because an order may have
+ * multiple invoices over its lifecycle (e.g., correction invoices).
+ * The domain models this as a one-to-many relationship even though
+ * the most common case is one invoice per order.
+ */
 public interface InvoiceRepository {
 
     Invoice save(Invoice invoice);

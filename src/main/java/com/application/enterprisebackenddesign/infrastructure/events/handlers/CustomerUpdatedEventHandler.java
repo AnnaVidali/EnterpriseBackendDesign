@@ -8,6 +8,14 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+/**
+ * Async event handler: propagates customer profile changes to external CRM.
+ *
+ * DDD domain event pattern: Reacts to CustomerUpdatedEvent by syncing the
+ * changed field to the CRM. This keeps the CRM eventually consistent with
+ * the customer data without coupling the customer update use case to the
+ * CRM API.
+ */
 @Component
 public class CustomerUpdatedEventHandler {
     private static final Logger log = LoggerFactory.getLogger(CustomerUpdatedEventHandler.class);

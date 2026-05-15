@@ -8,6 +8,10 @@ import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+/**
+ * Use case for creating a new customer. Validates input, persists the
+ * customer, and publishes the resulting domain events.
+ */
 @Service
 @Transactional
 public class CreateCustomerUseCase {

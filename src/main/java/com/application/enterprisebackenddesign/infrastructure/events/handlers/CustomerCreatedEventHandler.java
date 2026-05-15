@@ -9,6 +9,17 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+/**
+ * Async event handler: triggers welcome email + CRM sync on customer creation.
+ *
+ * DDD domain event pattern: This handler reacts to a domain event published
+ * by the CreateCustomerUseCase. It runs asynchronously (fire-and-forget)
+ * so the use case transaction is not delayed by side effects.
+ *
+ * Each handler follows the Single Responsibility Principle — it orchestrates
+ * exactly the side effects that belong together. Here, both email and CRM
+ * sync happen on customer creation.
+ */
 @Component
 public class CustomerCreatedEventHandler {
     private static final Logger log = LoggerFactory.getLogger(CustomerCreatedEventHandler.class);

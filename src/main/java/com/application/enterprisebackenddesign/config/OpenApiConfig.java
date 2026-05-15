@@ -10,6 +10,18 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * OpenAPI documentation configuration.
+ *
+ * Infrastructure concern: Generates the Swagger/OpenAPI specification from
+ * code annotations (@Operation, @ApiResponse, etc.). The spec is available
+ * at /v3/api-docs and the interactive UI at /swagger-ui.html.
+ *
+ * Architectural note: The API spec is generated from code, not hand-maintained.
+ * This ensures the documentation stays in sync with the implementation.
+ * The JWT security scheme is defined here so all endpoints documented in
+ * Swagger show the "Authorize" button automatically.
+ */
 @Configuration
 public class OpenApiConfig {
 

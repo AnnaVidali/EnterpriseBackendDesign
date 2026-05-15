@@ -19,6 +19,20 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+/**
+ * REST controller for the Product aggregate.
+ *
+ * Hexagonal Architecture (Adapter layer): Inbound adapter that delegates
+ * to product use cases. This controller has an interesting security
+ * distinction: GET endpoints are public (no authentication required per
+ * SecurityConfig), while POST/PUT/DELETE require authentication. This
+ * reflects a real-world pattern where the product catalog is publicly
+ * readable but only admins can modify it.
+ *
+ * The controller is intentionally thin — every method is a one-liner
+ * that delegates to a use case and maps the result. No business logic
+ * lives here.
+ */
 @RestController
 @RequestMapping("/api/products")
 @Tag(name = "Products", description = "CRUD operations for product catalog management")

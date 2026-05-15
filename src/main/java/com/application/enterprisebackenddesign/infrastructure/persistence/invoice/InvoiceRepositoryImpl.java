@@ -11,6 +11,17 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Adapter implementation of the InvoiceRepository port.
+ *
+ * Hexagonal Architecture: Follows the same adapter pattern as
+ * CustomerRepositoryImpl and OrderRepositoryImpl. Translates between
+ * domain Invoice objects and JPA InvoiceEntity objects via InvoiceMapper.
+ *
+ * The domain layer depends only on the InvoiceRepository interface;
+ * this implementation can be swapped out (e.g., for MongoDB) without
+ * changing any domain code.
+ */
 @Repository
 public class InvoiceRepositoryImpl implements InvoiceRepository {
 

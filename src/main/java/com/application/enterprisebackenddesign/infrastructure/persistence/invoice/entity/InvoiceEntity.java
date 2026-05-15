@@ -11,6 +11,24 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * JPA entity for the invoices table.
+ *
+ * Interview context: Like all entities in this project, InvoiceEntity uses
+ * weak ID references (Long customerId, Long orderId) instead of @ManyToOne
+ * JPA relationships. This is a deliberate architectural choice:
+ *
+ * 1. Aggregate boundaries: Invoice, Customer, and Order are separate aggregates.
+ *    JPA @ManyToOne would cross aggregate boundaries, mixing concerns.
+ * 2. Performance: No lazy loading proxies, no N+1 query problems.
+ * 3. Simplicity: The entity is flat — all columns are in one table, no JOINs
+ *    needed for basic CRUD.
+ *
+ * The amount + currency pattern mirrors the domain Money value object but
+ * stored as two flat columns (DECIMAL + VARCHAR) rather than an @Embedded.
+ * Either approach works — this is just a slightly different mapping choice
+ * than ProductEntity (which uses @Embedded MoneyEmbeddable for price).
+ */
 @Setter
 @Getter
 @Entity

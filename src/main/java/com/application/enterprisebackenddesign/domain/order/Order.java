@@ -7,6 +7,36 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 
+/**
+ * Aggregate root representing a customer order.
+ * Manages order lines, status transitions (CREATED, CONFIRMED, CANCELLED),
+ * total amount calculation, and raises domain events on all state changes.
+ *
+ * Interview context: Order is the richest aggregate in the system. Some key
+ * design decisions:
+ *
+ * 1. Aggregate boundary: Order owns OrderLine. All access to order lines
+ *    goes through Order methods (addLine, removeLine, updateOrderLines).
+ *    This enforces invariants like "no line changes after CONFIRMED".
+ *
+ * 2. Two constructors: The 4-param constructor creates a NEW order (raises
+ *    OrderCreatedEvent). The 5-param constructor is for RECONSTITUTION from
+ *    the database — it preserves whatever status was persisted and does NOT
+ *    raise a creation event. This pattern ("command constructor" vs
+ *    "reconstitution constructor") avoids replaying events on load.
+ *
+ * 3. Status machine: Order enforces a finite state machine internally.
+ *    CREATED → CONFIRMED → BILLED (via invoice), with CANCELLED allowed
+ *    from CREATED or CONFIRMED. The domain model prevents illegal transitions
+ *    via exceptions, keeping this logic visible and testable.
+ *
+ * 4. Domain events for every change: Each state-changing method raises a
+ *    typed domain event. Events are collected in-memory and pulled by the
+ *    use case after persistence, preventing duplicate publication on errors.
+ *
+ * 5. Total recalculation: totalAmount is always derived from order lines,
+ *    never set directly. This prevents inconsistency bugs.
+ */
 @Getter
 public class Order {
     private final Long id;
@@ -17,11 +47,30 @@ public class Order {
     private final Currency currency;
     private final List<DomainEvent> events = new ArrayList<>();
 
+    /**
+     * Convenience constructor that creates an order with CREATED status.
+     *
+     * @param id          unique identifier, must not be null
+     * @param customerId  owning customer, must not be null
+     * @param orderLines  initial line items, must not be null
+     * @param currency    order currency, must not be null
+     * @throws DomainException.BusinessRuleViolationException if any validation fails
+     */
     public Order(Long id, Long customerId, List<OrderLine> orderLines, Currency currency) throws DomainException.BusinessRuleViolationException {
         this(id, customerId, orderLines, currency, OrderStatus.CREATED);
         events.add(new OrderCreatedEvent(this.id, this.customerId, this.orderLines.size()));
     }
 
+    /**
+     * Full constructor that allows specifying the initial order status.
+     *
+     * @param id          unique identifier, must not be null
+     * @param customerId  owning customer, must not be null
+     * @param orderLines  initial line items, must not be null
+     * @param currency    order currency, must not be null
+     * @param status      initial order status
+     * @throws DomainException.BusinessRuleViolationException if any validation fails
+     */
     public Order(Long id, Long customerId, List<OrderLine> orderLines, Currency currency, OrderStatus status) throws DomainException.BusinessRuleViolationException {
         if(id == null){
             throw new DomainException.BusinessRuleViolationException("Id cannot be null.");
@@ -43,6 +92,12 @@ public class Order {
         this.totalAmount = calculateTotal();
     }
 
+    /**
+     * Adds an order line to the order. Only allowed when status is CREATED.
+     *
+     * @param orderLine the line item to add, must not be null and must match the order currency
+     * @throws DomainException.BusinessRuleViolationException if the order line is invalid or the order cannot be modified
+     */
     public void addLine(OrderLine orderLine) throws DomainException.BusinessRuleViolationException {
 
         if(orderLine == null){
@@ -66,6 +121,12 @@ public class Order {
         }
     }
 
+    /**
+     * Removes an order line from the order. Only allowed when status is CREATED.
+     *
+     * @param orderLine the line item to remove, must already exist in the order
+     * @throws DomainException.BusinessRuleViolationException if the order line is not found or the order cannot be modified
+     */
     public void removeLine(OrderLine orderLine) throws DomainException.BusinessRuleViolationException {
 
         if(orderLine == null){
@@ -85,6 +146,11 @@ public class Order {
         }
     }
 
+    /**
+     * Transitions the order from CREATED to CONFIRMED. Requires at least one order line.
+     *
+     * @throws DomainException.BusinessRuleViolationException if the order cannot be confirmed
+     */
     public void confirmOrder() throws DomainException.BusinessRuleViolationException {
 
         if(status == OrderStatus.CREATED && !orderLines.isEmpty()){
@@ -96,6 +162,11 @@ public class Order {
         }
     }
 
+    /**
+     * Cancels the order. Only allowed when status is CREATED or CONFIRMED.
+     *
+     * @throws DomainException.BusinessRuleViolationException if the order cannot be cancelled
+     */
     public void cancelOrder() throws DomainException.BusinessRuleViolationException {
 
         if(status == OrderStatus.CREATED || status == OrderStatus.CONFIRMED){
@@ -132,6 +203,14 @@ public class Order {
         return total;
     }
 
+    /**
+     * Updates the quantity of an existing order line. If the new quantity is zero the line is removed.
+     * Only allowed when status is CREATED.
+     *
+     * @param orderLine  the line item to update, must already exist in the order
+     * @param newQuantity the new quantity for the line item, must not be negative
+     * @throws DomainException.BusinessRuleViolationException if the order line is not found or the order cannot be modified
+     */
     public void updateOrderLines(OrderLine orderLine, int newQuantity) throws DomainException.BusinessRuleViolationException {
 
         if(orderLine == null){
