@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Currency;
 
-@Component
+@Component("infraInvoiceMapper")
 public class InvoiceMapper {
 
     public InvoiceEntity toEntity(Invoice invoice) {

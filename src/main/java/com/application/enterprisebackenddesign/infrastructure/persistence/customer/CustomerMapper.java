@@ -5,7 +5,7 @@ import com.application.enterprisebackenddesign.domain.shared.DomainException;
 import com.application.enterprisebackenddesign.infrastructure.persistence.customer.entity.CustomerEntity;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("infraCustomerMapper")
 public class CustomerMapper {
 
     public CustomerEntity toEntity(Customer customer) {

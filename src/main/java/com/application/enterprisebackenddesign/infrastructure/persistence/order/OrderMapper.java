@@ -14,7 +14,7 @@ import java.util.Currency;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
+@Component("infraOrderMapper")
 public class OrderMapper {
 
     public OrderEntity toEntity(Order order) {

@@ -24,6 +24,11 @@ spring:
 server:
   port: ${SERVER_PORT:8080}
 
+app:
+  jwt:
+    secret: ${JWT_SECRET:4A6F5B6D7C8E9F0A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3F}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
 payment:
   gateway:
     stripe:
