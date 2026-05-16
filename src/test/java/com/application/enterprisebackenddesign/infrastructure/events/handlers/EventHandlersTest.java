@@ -1,5 +1,7 @@
 package com.application.enterprisebackenddesign.infrastructure.events.handlers;
 
+import com.application.enterprisebackenddesign.domain.customer.Customer;
+import com.application.enterprisebackenddesign.domain.customer.CustomerRepository;
 import com.application.enterprisebackenddesign.domain.invoice.InvoiceStatus;
 import com.application.enterprisebackenddesign.domain.shared.*;
 import com.application.enterprisebackenddesign.infrastructure.service.*;
@@ -11,8 +13,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.Optional;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EventHandlersTest {
@@ -21,6 +25,7 @@ class EventHandlersTest {
     @Mock private CrmService crmService;
     @Mock private AnalyticsService analyticsService;
     @Mock private InventoryService inventoryService;
+    @Mock private CustomerRepository customerRepository;
 
     @InjectMocks private InvoiceIssuedEventHandler invoiceIssuedHandler;
     @InjectMocks private PaymentCompletedEventHandler paymentCompletedHandler;
@@ -37,18 +42,22 @@ class EventHandlersTest {
 
     @Test
     void invoiceIssuedHandlerSendsEmail() throws Exception {
+        var customer = new Customer(1L, "Jane", "Doe", "jane.doe@example.com");
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
         var event = new InvoiceIssuedEvent(1L, 1L, 1L, new Money(new BigDecimal("100"), usd));
         invoiceIssuedHandler.handle(event);
-        verify(emailService).sendEmail("customer@example.com", "Invoice Issued",
-                "Your invoice 1 for amount 100.00 USD has been issued.");
+        verify(emailService).sendEmail("jane.doe@example.com", "Invoice Issued",
+                "Your invoice 1 for amount Money {\n\tamount = 100.00,\n\tcurrency = USD\n} has been issued.");
     }
 
     @Test
     void paymentCompletedHandlerSendsEmailAndUpdatesCrm() throws Exception {
+        var customer = new Customer(1L, "John", "Smith", "john.smith@example.com");
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
         var event = new PaymentCompletedEvent(1L, 1L, 1L, 1L, new Money(new BigDecimal("100"), usd));
         paymentCompletedHandler.handle(event);
-        verify(emailService).sendEmail("customer@example.com", "Payment Confirmed",
-                "Your payment of 100.00 USD has been confirmed.");
+        verify(emailService).sendEmail("john.smith@example.com", "Payment Confirmed",
+                "Your payment of Money {\n\tamount = 100.00,\n\tcurrency = USD\n} has been confirmed.");
         verify(crmService).updateOrderStatus(1L, "PAID");
     }
 

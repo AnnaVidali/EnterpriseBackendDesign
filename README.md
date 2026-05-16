@@ -59,24 +59,51 @@ src/main/java/com/application/enterprisebackenddesign/
 ## Getting Started
 
 ### Prerequisites
-- Java 17+
-- Docker and Docker Compose (for local development with PostgreSQL and Kafka)
-- Maven 3.8+
+- Java 17
+- Docker & Docker Compose
 
-### Running the Application
+### Run Locally
 
 ```bash
-./mvnw spring-boot:run -Dspring-boot.run.profiles=prod
+# 1. Start infrastructure (PostgreSQL, Kafka)
+docker-compose up -d
+
+# 2. Start the application
+./mvnw spring-boot:run
 ```
 
-With the `prod` profile, ensure these environment variables are set:
-- `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`
-- `KAFKA_BOOTSTRAP_SERVERS`
-- `JWT_SECRET`
+The application will start on `http://localhost:8080`.
 
-For development, default credentials are in `application.yml`.
+> **Note:** The docker-compose.yml uses `enterprise` / `enterprise` for the database credentials, matching the defaults in `application.yml`. No environment variables are required for local development.
 
-The application will start on `http://localhost:8080`
+### Run Tests
+
+```bash
+./mvnw test
+```
+
+### API Documentation
+
+Once running, visit: http://localhost:8080/swagger-ui.html
+
+### Default Credentials (dev only)
+
+| Username | Password |
+|---|---|
+| `admin` | `admin123` |
+| `user`  | `user123` |
+
+### Full API Flow
+
+```
+ 1. POST /api/auth/login           → get JWT token
+ 2. POST /api/customers            → create a customer
+ 3. POST /api/products             → create a product
+ 4. POST /api/orders               → create an order
+ 5. POST /api/orders/{id}/confirm  → confirm the order
+ 6. POST /api/invoices/issue/{id}  → issue an invoice
+ 7. POST /api/payments             → process payment
+```
 
 ### Database
 
