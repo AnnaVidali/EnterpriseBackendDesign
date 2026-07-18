@@ -39,10 +39,14 @@ public class ProductEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String sku;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "price_amount", nullable = false, precision = 19, scale = 2)),
+            @AttributeOverride(name = "currency", column = @Column(name = "price_currency", nullable = false, length = 3))
+    })
     private MoneyEmbeddable price;
 
     @CreatedDate
@@ -54,5 +58,6 @@ public class ProductEntity {
     private LocalDateTime lastModifiedDate;
 
     @Version
+    @Column(nullable = false)
     private Long version = 0L;
 }

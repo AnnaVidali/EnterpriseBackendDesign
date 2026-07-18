@@ -31,6 +31,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "order_lines")
 public class OrderLineEntity {
+
     @Id
     private Long id;
 
@@ -41,10 +42,14 @@ public class OrderLineEntity {
     private int quantity;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "price_amount", nullable = false, precision = 19, scale = 2)),
+            @AttributeOverride(name = "currency", column = @Column(name = "price_currency", nullable = false, length = 3))
+    })
     private MoneyEmbeddable price;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
+    @JoinColumn(name = "order_id", nullable = false)
     private OrderEntity order;
 
 }

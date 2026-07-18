@@ -62,6 +62,7 @@ public class OrderEntity {
     private LocalDateTime lastModifiedDate;
 
     @Version
+    @Column(nullable = false)
     private Long version = 0L;
 
     @OneToMany(

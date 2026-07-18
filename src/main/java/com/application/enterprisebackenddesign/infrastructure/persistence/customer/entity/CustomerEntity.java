@@ -54,5 +54,6 @@ public class CustomerEntity {
     private LocalDateTime lastModifiedDate;
 
     @Version
+    @Column(nullable = false)
     private Long version = 0L;
 }
