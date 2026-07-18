@@ -3,7 +3,7 @@ spring:
     name: enterprise-backend-design
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/enterprise_db
+    url: jdbc:postgresql://localhost:5433/enterprise_db
     username: ${DB_USERNAME:enterprise}
     password: ${DB_PASSWORD:enterprise}
     driver-class-name: org.postgresql.Driver
